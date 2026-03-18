@@ -10,15 +10,22 @@ import type { GameStatus, Play, StatLine, TeamInfo } from '@/api/types';
 const LIVE_INTERVAL = 20_000;
 const IDLE_INTERVAL = 120_000;
 
-function buildTeamFromSummary(competitor: NonNullable<NonNullable<NonNullable<ReturnType<typeof Object.create>>['header']>['competitions']>[0]['competitors'][0]): TeamInfo {
-  const logo = competitor.team.logo
-    ?? competitor.team.logos?.[0]?.href
+type SummaryCompetitor = NonNullable<
+  NonNullable<NonNullable<import('@/api/types').EspnSummaryResponse['header']>['competitions']>[0]['competitors']
+>[0];
+
+function buildTeamFromSummary(competitor: SummaryCompetitor): TeamInfo {
+  const team = competitor.team ?? {};
+  const logo = (team as { logo?: string }).logo
+    ?? (team as { logos?: Array<{ href: string }> }).logos?.[0]?.href
     ?? '';
+  const abbreviation = (team as { abbreviation?: string }).abbreviation ?? '?';
+  const displayName = (team as { displayName?: string }).displayName ?? abbreviation;
   const record = competitor.records?.find(r => r.type === 'total' || r.type === 'overall')?.summary;
   return {
-    id: competitor.team.abbreviation,
-    abbreviation: competitor.team.abbreviation,
-    displayName: competitor.team.displayName,
+    id: abbreviation,
+    abbreviation,
+    displayName,
     logo,
     score: competitor.score ?? '0',
     winner: competitor.winner ?? false,
@@ -70,7 +77,7 @@ export function useGameSummary(
       if (!home || !away) throw classifyError({ response: { status: 404 } });
 
       const broadcasts: string[] = [];
-      competition.broadcasts?.forEach(b => broadcasts.push(...b.names));
+      competition.broadcasts?.forEach(b => { if (b.names) broadcasts.push(...b.names); });
 
       // Box score stats — key sport-relevant stats only
       const STAT_KEYS = ['passingYards', 'rushingYards', 'receivingYards', 'totalYards',

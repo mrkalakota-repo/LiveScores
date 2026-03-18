@@ -1,9 +1,11 @@
 import type { EspnStatus, GameStatus } from '@/api/types';
 
 export function getGameStatus(status: EspnStatus): GameStatus {
-  const { state, detail } = status.type;
+  const state = status.type?.state;
+  const detail = status.type?.detail ?? '';
   if (state === 'post') return 'final';
   if (state === 'pre') return 'scheduled';
+  if (!state) return 'scheduled';
   // in-progress: check for halftime / innings break / tea break
   const detailLower = detail.toLowerCase();
   if (
@@ -17,7 +19,9 @@ export function getGameStatus(status: EspnStatus): GameStatus {
 }
 
 export function getStatusText(status: EspnStatus, sport: string): string {
-  const { state, detail, shortDetail } = status.type;
+  const state = status.type?.state;
+  const detail = status.type?.detail ?? '';
+  const shortDetail = status.type?.shortDetail ?? '';
 
   if (state === 'post') return 'Final';
   if (state === 'pre') return shortDetail || detail;
