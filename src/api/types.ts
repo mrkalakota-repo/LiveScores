@@ -1,0 +1,139 @@
+// ── Raw ESPN API types ──────────────────────────────────────────────────────
+
+export interface EspnScoreboardResponse {
+  events: EspnEvent[];
+}
+
+export interface EspnEvent {
+  id: string;
+  date: string;
+  name: string;
+  shortName: string;
+  competitions: EspnCompetition[];
+  status: EspnStatus;
+}
+
+export interface EspnCompetition {
+  id: string;
+  date: string;
+  venue?: { fullName: string };
+  broadcasts?: Array<{ names: string[] }>;
+  competitors: EspnCompetitor[];
+  status: EspnStatus;
+  situation?: {
+    lastPlay?: { text: string };
+    balls?: number;
+    strikes?: number;
+    outs?: number;
+    onFirst?: boolean;
+    onSecond?: boolean;
+    onThird?: boolean;
+  };
+}
+
+export interface EspnCompetitor {
+  id: string;
+  homeAway: 'home' | 'away';
+  team: {
+    id: string;
+    abbreviation: string;
+    displayName: string;
+    logo?: string;
+    logos?: Array<{ href: string }>;
+  };
+  score?: string;
+  winner?: boolean;
+  linescores?: Array<{ value: number }>;
+  records?: Array<{ summary: string; type: string }>;
+}
+
+export interface EspnStatus {
+  clock?: number;
+  displayClock?: string;
+  period?: number;
+  type: {
+    id: string;
+    name: string;
+    state: 'pre' | 'in' | 'post';
+    completed: boolean;
+    description: string;
+    detail: string;
+    shortDetail: string;
+  };
+}
+
+// ── Normalized types (what components consume) ──────────────────────────────
+
+export type GameStatus = 'scheduled' | 'live' | 'halftime' | 'final';
+
+export interface TeamInfo {
+  id: string;
+  abbreviation: string;
+  displayName: string;
+  logo: string;
+  score: string;
+  winner: boolean;
+  record?: string;
+  linescores?: number[];
+}
+
+export interface GameData {
+  id: string;
+  sport: string;
+  league: string;
+  homeTeam: TeamInfo;
+  awayTeam: TeamInfo;
+  status: GameStatus;
+  statusText: string;
+  startTime: string;
+  venue?: string;
+  broadcasts: string[];
+  situation?: string;
+}
+
+// ── ESPN Summary API types ───────────────────────────────────────────────────
+
+export interface EspnSummaryResponse {
+  header?: {
+    competitions?: Array<{
+      venue?: { fullName?: string };
+      status?: EspnStatus;
+      competitors?: Array<{
+        homeAway: 'home' | 'away';
+        team: { abbreviation: string; displayName: string; logo?: string; logos?: Array<{ href: string }> };
+        score?: string;
+        winner?: boolean;
+        linescores?: Array<{ displayValue?: string; value?: number }>;
+        records?: Array<{ summary: string; type: string }>;
+      }>;
+      broadcasts?: Array<{ names: string[] }>;
+    }>;
+  };
+  boxscore?: {
+    teams?: Array<{
+      team: { abbreviation: string };
+      statistics?: Array<{ name: string; displayValue: string; label?: string }>;
+    }>;
+  };
+  plays?: Array<{
+    id?: string;
+    text?: string;
+    type?: { text?: string };
+    clock?: { displayValue?: string };
+    scoreValue?: number;
+    team?: { abbreviation?: string };
+  }>;
+}
+
+export interface StatLine {
+  label: string;
+  value: string;
+}
+
+export interface Play {
+  id: string;
+  text: string;
+  clock?: string;
+  team?: string;
+  isScore: boolean;
+}
