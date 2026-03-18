@@ -75,10 +75,13 @@ export default function TabLayout() {
           fontSize: 10,
           fontWeight: '600',
         },
+        // Fixed width per item so no tab ever wraps its label to a second line
         tabBarItemStyle: {
           height: 56,
+          width: 64,
           justifyContent: 'center',
         },
+        tabBarScrollEnabled: true,
         sceneStyle: {
           backgroundColor: Colors.background,
         },
