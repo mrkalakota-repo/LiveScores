@@ -111,11 +111,8 @@ export function useGameSummary(
         recentPlays,
       };
     },
-    // Poll fast for live games, slower otherwise — derived from cached data
-    refetchInterval: (query) => {
-      const status = query.state.data?.status;
-      return status === 'live' || status === 'halftime' ? LIVE_INTERVAL : IDLE_INTERVAL;
-    },
+    // Poll fast for live/halftime games, slower otherwise
+    refetchInterval: LIVE_INTERVAL,
     refetchIntervalInBackground: false,
     staleTime: 15_000,
     retry: (failureCount, error) => error.kind !== 'not_found' && failureCount < 2,
