@@ -1,56 +1,58 @@
 export const Colors = {
   // ── Backgrounds ────────────────────────────────────────────────────────────
-  background: '#060d1c',
-  surface: '#0e1a2e',
-  surfaceElevated: '#172540',
-  border: '#1c2e44',
-  borderSubtle: '#0e1a2e',
+  background: '#080f1d',
+  surface: '#0c1828',
+  surfaceElevated: '#142235',
+  border: '#1a2d42',
+  borderSubtle: '#0c1828',
 
   // ── Typography ─────────────────────────────────────────────────────────────
-  textPrimary: '#f0f6ff',
-  textSecondary: '#8eadc7',
-  textMuted: '#4d6c86',
+  textPrimary: '#f5f9ff',
+  textSecondary: '#7ca3c0',
+  textMuted: '#3d5e76',
 
   // ── Status: Live ───────────────────────────────────────────────────────────
-  live: '#ff3b5c',
-  liveBackground: '#2a0614',
-  liveBorder: '#5a0e26',
+  live: '#ff375f',
+  liveBackground: '#1a0610',
+  liveBorder: '#5a1025',
+  liveCardBackground: '#110816',
 
   // ── Status: Halftime / Break ───────────────────────────────────────────────
-  halftime: '#ff9f0a',
-  halftimeBackground: '#261500',
-  halftimeBorder: '#4d2e00',
+  halftime: '#ff9500',
+  halftimeBackground: '#1f1200',
+  halftimeBorder: '#4d3000',
 
   // ── Status: Final ──────────────────────────────────────────────────────────
-  final: '#5b7a90',
-  finalBackground: '#0e1a2e',
-  finalBorder: '#1c2e44',
+  final: '#52738a',
+  finalBackground: '#0c1828',
+  finalBorder: '#1a2d42',
 
-  // ── Status: Scheduled ─────────────────────────────────────────────────────
-  scheduled: '#4da6ff',
-  scheduledBackground: '#071830',
-  scheduledBorder: '#0e3060',
+  // ── Status: Scheduled ──────────────────────────────────────────────────────
+  scheduled: '#0a84ff',
+  scheduledBackground: '#001830',
+  scheduledBorder: '#003575',
 
   // ── Game Results ───────────────────────────────────────────────────────────
-  winner: '#f0f6ff',
-  loser: '#3d5a70',
-  winnerScore: '#4da6ff',
-  loserScore: '#3d5a70',
+  winner: '#f5f9ff',
+  loser: '#3d5e76',
+  winnerScore: '#30d158',   // green — universally recognised as "winner"
+  loserScore: '#3d5e76',
 
   // ── Navigation ─────────────────────────────────────────────────────────────
-  tabActive: '#4da6ff',
-  tabInactive: '#4d6c86',
-  tabBarBackground: '#030a16',
+  tabActive: '#0a84ff',
+  tabInactive: '#3d5e76',
+  tabLive: '#ff375f',       // icon colour when tab has live games and is not focused
+  tabBarBackground: '#050d1a',
 
   // ── League Chips ───────────────────────────────────────────────────────────
-  chipActive: '#1a5fb4',
-  chipActiveBorder: '#4da6ff',
-  chipActiveText: '#f0f6ff',
-  chipInactive: '#0e1a2e',
-  chipInactiveBorder: '#1c2e44',
-  chipInactiveText: '#8eadc7',
+  chipActive: '#092e60',
+  chipActiveBorder: '#0a84ff',
+  chipActiveText: '#f5f9ff',
+  chipInactive: '#0c1828',
+  chipInactiveBorder: '#1a2d42',
+  chipInactiveText: '#7ca3c0',
 
   // ── Misc ───────────────────────────────────────────────────────────────────
-  divider: '#0e1a2e',
-  accent: '#4da6ff',
+  divider: '#0c1828',
+  accent: '#0a84ff',
 };

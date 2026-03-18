@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
@@ -6,6 +7,43 @@ import { SPORTS } from '@/constants/sports';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+interface LiveTabIconProps {
+  name: IoniconName;
+  color: string;
+  focused: boolean;
+  hasLive: boolean;
+}
+
+function LiveTabIcon({ name, color, focused, hasLive }: LiveTabIconProps) {
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!hasLive || focused) {
+      pulseAnim.setValue(1);
+      return;
+    }
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 0.2, duration: 550, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 550, useNativeDriver: true }),
+      ]),
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [hasLive, focused, pulseAnim]);
+
+  const iconColor = !focused && hasLive ? Colors.tabLive : color;
+
+  return (
+    <View style={styles.iconWrap}>
+      <Ionicons name={name} size={22} color={iconColor} />
+      {!focused && hasLive && (
+        <Animated.View style={[styles.liveDot, { opacity: pulseAnim }]} />
+      )}
+    </View>
+  );
+}
 
 export default function TabLayout() {
   const { liveCounts } = useLiveGames();
@@ -37,7 +75,6 @@ export default function TabLayout() {
           fontSize: 10,
           fontWeight: '600',
         },
-        // Fixed item height prevents elongation when label/icon sizes differ
         tabBarItemStyle: {
           height: 56,
           justifyContent: 'center',
@@ -53,25 +90,33 @@ export default function TabLayout() {
           name={sport.id}
           options={{
             title: sport.label,
-            // Fixed size (no active/inactive size variation) prevents layout shift
-            tabBarIcon: ({ color }) => (
-              <Ionicons name={sport.icon as IoniconName} size={22} color={color} />
+            tabBarIcon: ({ color, focused }) => (
+              <LiveTabIcon
+                name={sport.icon as IoniconName}
+                color={color}
+                focused={focused}
+                hasLive={(liveCounts[sport.id] ?? 0) > 0}
+              />
             ),
-            // Show a red dot when live games are happening in this sport
-            tabBarBadge: (liveCounts[sport.id] ?? 0) > 0 ? liveCounts[sport.id] : undefined,
-            tabBarBadgeStyle: {
-              backgroundColor: Colors.live,
-              color: '#fff',
-              fontSize: 9,
-              fontWeight: '700',
-              minWidth: 16,
-              height: 16,
-              borderRadius: 8,
-              lineHeight: 16,
-            },
           }}
         />
       ))}
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  iconWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  liveDot: {
+    position: 'absolute',
+    top: -3,
+    right: -5,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: Colors.tabLive,
+  },
+});

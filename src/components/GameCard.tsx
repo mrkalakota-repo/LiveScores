@@ -20,6 +20,7 @@ const LEFT_ACCENT: Partial<Record<string, string>> = {
 export const GameCard = memo(function GameCard({ game }: Props) {
   const router = useRouter();
   const accentColor = LEFT_ACCENT[game.status] ?? Colors.border;
+  const isLive = game.status === 'live' || game.status === 'halftime';
 
   const handlePress = useCallback(() => {
     router.push({
@@ -30,7 +31,11 @@ export const GameCard = memo(function GameCard({ game }: Props) {
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      style={({ pressed }) => [
+        styles.card,
+        isLive && styles.cardLive,
+        pressed && styles.cardPressed,
+      ]}
       onPress={handlePress}
       accessibilityLabel={`${game.awayTeam.abbreviation} vs ${game.homeTeam.abbreviation}, tap for details`}
       accessibilityRole="button"
@@ -75,6 +80,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     overflow: 'hidden',
+  },
+  cardLive: {
+    backgroundColor: Colors.liveCardBackground,
+    borderColor: Colors.liveBorder,
   },
   cardPressed: { opacity: 0.82 },
   accent: {
