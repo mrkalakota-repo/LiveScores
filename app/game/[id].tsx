@@ -22,12 +22,10 @@ export default function GameDetailScreen() {
     league: string;
   }>();
 
-  const isLive = true; // will be overridden by actual status below
   const { data, isLoading, isError, error, refetch } = useGameSummary(
     sport ?? '',
     league ?? '',
     id ?? '',
-    isLive,
   );
 
   const handleBack = useCallback(() => {

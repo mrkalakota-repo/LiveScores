@@ -7,7 +7,7 @@ import { LoadingScreen } from './LoadingScreen';
 import { ErrorScreen } from './ErrorScreen';
 import { EmptyState } from './EmptyState';
 import { LastUpdatedBar } from './LastUpdatedBar';
-import type { AppError } from '@/api/errors';
+import { AppError } from '@/api/errors';
 import type { GameData } from '@/api/types';
 
 interface Props {
@@ -51,7 +51,13 @@ export function ScoreboardList({
   );
 
   if (isLoading) return <LoadingScreen />;
-  if (isError) return <ErrorScreen onRetry={onRetry} error={error} />;
+  if (isError) {
+    // "not_found" means ESPN has no data for this sport/league — show empty state instead of error
+    if (error instanceof AppError && error.kind === 'not_found') {
+      return <EmptyState sport={sport} />;
+    }
+    return <ErrorScreen onRetry={onRetry} error={error} />;
+  }
   if (games.length === 0) return <EmptyState sport={sport} />;
 
   return (

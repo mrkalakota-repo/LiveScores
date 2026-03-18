@@ -3,6 +3,7 @@ import { AppState, AppStateStatus, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-query';
+import { LiveGamesProvider } from '@/contexts/LiveGamesContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,8 +31,10 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false }} />
+      <LiveGamesProvider>
+        <StatusBar style="light" />
+        <Stack screenOptions={{ headerShown: false }} />
+      </LiveGamesProvider>
     </QueryClientProvider>
   );
 }

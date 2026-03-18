@@ -46,7 +46,6 @@ export function useGameSummary(
   sport: string,
   league: string,
   eventId: string,
-  isLive: boolean,
 ) {
   return useQuery<GameSummaryData, AppError>({
     queryKey: ['game-summary', sport, league, eventId],
@@ -60,7 +59,10 @@ export function useGameSummary(
       const gameStatus: GameStatus = rawStatus ? getGameStatus(rawStatus) : 'scheduled';
       let statusText = rawStatus ? getStatusText(rawStatus, sport) : '';
       if (gameStatus === 'scheduled' && rawStatus) {
-        statusText = formatGameTime(rawStatus.type.detail);
+        // type.detail is often "7:30 PM ET" (not ISO) — only call formatGameTime on real ISO dates
+        const detail = rawStatus.type.detail;
+        const parsed = new Date(detail);
+        statusText = !isNaN(parsed.getTime()) ? formatGameTime(detail) : detail;
       }
 
       const home = competition.competitors?.find(c => c.homeAway === 'home');
@@ -109,7 +111,11 @@ export function useGameSummary(
         recentPlays,
       };
     },
-    refetchInterval: isLive ? LIVE_INTERVAL : IDLE_INTERVAL,
+    // Poll fast for live games, slower otherwise — derived from cached data
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === 'live' || status === 'halftime' ? LIVE_INTERVAL : IDLE_INTERVAL;
+    },
     refetchIntervalInBackground: false,
     staleTime: 15_000,
     retry: (failureCount, error) => error.kind !== 'not_found' && failureCount < 2,
