@@ -28,6 +28,7 @@ export const GameCard = memo(function GameCard({ game }: Props) {
     <Pressable
       style={({ pressed }) => [
         styles.card,
+        { backgroundColor: C.surface, borderColor: C.border },
         isLive && styles.cardLive,
         pressed && styles.cardPressed,
       ]}

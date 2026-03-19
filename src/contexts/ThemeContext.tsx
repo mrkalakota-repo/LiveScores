@@ -8,15 +8,15 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  themeName: 'electric',
+  themeName: 'carbon',
   setTheme: () => {},
-  C: THEMES.electric,
+  C: THEMES.carbon,
 });
 
 export { THEME_META };
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [themeName, setThemeState] = useState<ThemeName>('electric');
+  const [themeName, setThemeState] = useState<ThemeName>('carbon');
 
   const setTheme = useCallback((name: ThemeName) => {
     setThemeState(name);
