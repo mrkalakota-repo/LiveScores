@@ -139,14 +139,14 @@ export default function GameDetailScreen() {
               <Text style={styles.sectionTitle}>PLAYER STATS</Text>
               {(() => {
                 // Group lines by category
-                const cats = [...new Set(data.playerLines.map(p => p.category))];
+                const cats = [...new Set(data.playerLines.map(p => p.category))].filter(Boolean);
                 return cats.map(cat => {
                   const players = data.playerLines.filter(p => p.category === cat);
                   const labels = players[0]?.stats.map(s => s.label) ?? [];
                   return (
                     <View key={cat} style={styles.playerGroup}>
                       <View style={styles.playerCatHeader}>
-                        <Text style={styles.playerCatLabel}>{cat.toUpperCase()}</Text>
+                        <Text style={styles.playerCatLabel}>{cat?.toUpperCase()}</Text>
                         <View style={styles.playerStatLabels}>
                           {labels.map(lbl => (
                             <Text key={lbl} style={styles.playerColHeader}>{lbl}</Text>

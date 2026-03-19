@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Colors } from '@/constants/colors';
 import { SOCCER_LEAGUES, type SoccerLeague } from '@/constants/sports';
 import { useScoreboard } from '@/hooks/useScoreboard';
 import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
@@ -40,8 +41,6 @@ export default function SoccerScreen() {
     </View>
   );
 }
-
-import { Colors } from '@/constants/colors';
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },

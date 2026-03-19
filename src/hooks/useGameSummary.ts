@@ -120,7 +120,9 @@ export function useGameSummary(
       (raw.boxscore?.players ?? []).forEach(teamPlayers => {
         const abbrev = teamPlayers.team.abbreviation;
         (teamPlayers.statistics ?? []).forEach(catGroup => {
+          if (!catGroup.name) return; // skip groups with no name
           const categoryLabel = CATEGORY_LABELS[catGroup.name] ?? catGroup.name;
+          if (!categoryLabel) return;
           const labels = catGroup.labels ?? [];
           // Take top 2 athletes per category (sorted by first stat descending)
           const athletes = [...(catGroup.athletes ?? [])]
