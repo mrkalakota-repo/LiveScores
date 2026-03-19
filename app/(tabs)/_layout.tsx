@@ -4,6 +4,7 @@ import { Tabs } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useSportPreferences } from '@/contexts/SportPreferencesContext';
 import { SPORTS } from '@/constants/sports';
 import type { SportConfig } from '@/constants/sports';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
@@ -16,15 +17,13 @@ type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 /**
  * Runs in the layout (always mounted) so the cricket live-dot appears
  * without the user having to visit the cricket tab first.
- * Tab screens are lazy-loaded by Expo Router, so without this the cricket
- * screen never mounts and setLiveCount is never called.
  */
 function CricketLiveTracker() {
   const { data: leagues } = useCricketLeagues();
   const firstLeague = leagues?.[0];
   const { data } = useScoreboard(
     firstLeague?.sport ?? 'cricket',
-    firstLeague?.league ?? '',   // empty until leagues load → query stays disabled
+    firstLeague?.league ?? '',
   );
   const { setLiveCount } = useLiveGames();
 
@@ -83,81 +82,103 @@ function LiveTabIcon({ sport, color, focused, hasLive }: LiveTabIconProps) {
 export default function TabLayout() {
   const { liveCounts } = useLiveGames();
   const { C } = useTheme();
+  const { isSelected } = useSportPreferences();
+
+  // Does any unselected sport have live games?
+  const morHasLive = SPORTS.some(s => !isSelected(s.id) && (liveCounts[s.id] ?? 0) > 0);
 
   return (
     <>
       <CricketLiveTracker />
       <Tabs
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: Colors.background,
-          shadowColor: 'transparent',
-          borderBottomWidth: 1,
-          borderBottomColor: Colors.border,
-        },
-        headerTintColor: Colors.textPrimary,
-        headerTitleStyle: {
-          fontWeight: '800',
-          fontSize: 17,
-          letterSpacing: 0.3,
-        },
-        tabBarStyle: {
-          backgroundColor: Colors.tabBarBackground,
-          borderTopWidth: 0,
-          height: 58,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -6 },
-          shadowOpacity: 0.5,
-          shadowRadius: 16,
-          elevation: 16,
-        },
-        tabBarInactiveTintColor: Colors.tabInactive,
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '700',
-          letterSpacing: 0.3,
-        },
-        // Fixed width per item so no tab ever wraps its label to a second line
-        tabBarItemStyle: {
-          height: 56,
-          width: 64,
-          justifyContent: 'center',
-        },
-        tabBarScrollEnabled: true,
-        sceneStyle: {
-          backgroundColor: Colors.background,
-        },
-      }}
-    >
-      {SPORTS.map(sport => (
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: Colors.background,
+            shadowColor: 'transparent',
+            borderBottomWidth: 1,
+            borderBottomColor: Colors.border,
+          },
+          headerTintColor: Colors.textPrimary,
+          headerTitleStyle: {
+            fontWeight: '800',
+            fontSize: 17,
+            letterSpacing: 0.3,
+          },
+          tabBarStyle: {
+            backgroundColor: Colors.tabBarBackground,
+            borderTopWidth: 0,
+            height: 58,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -6 },
+            shadowOpacity: 0.5,
+            shadowRadius: 16,
+            elevation: 16,
+          },
+          tabBarInactiveTintColor: Colors.tabInactive,
+          tabBarLabelStyle: {
+            fontSize: 10,
+            fontWeight: '700',
+            letterSpacing: 0.3,
+          },
+          tabBarItemStyle: {
+            height: 56,
+            width: 64,
+            justifyContent: 'center',
+          },
+          tabBarScrollEnabled: true,
+          sceneStyle: {
+            backgroundColor: Colors.background,
+          },
+        }}
+      >
+        {SPORTS.map(sport => (
+          <Tabs.Screen
+            key={sport.id}
+            name={sport.id}
+            options={{
+              title: sport.label,
+              tabBarActiveTintColor: sport.tabColor,
+              // href: null hides the tab but keeps the route navigable
+              href: isSelected(sport.id) ? undefined : null,
+              tabBarIcon: ({ color, focused }) => (
+                <LiveTabIcon
+                  sport={sport}
+                  color={color}
+                  focused={focused}
+                  hasLive={(liveCounts[sport.id] ?? 0) > 0}
+                />
+              ),
+            }}
+          />
+        ))}
+
+        {/* "More" tab — only visible when at least one sport is hidden */}
         <Tabs.Screen
-          key={sport.id}
-          name={sport.id}
+          name="more"
           options={{
-            title: sport.label,
-            tabBarActiveTintColor: sport.tabColor,
-            tabBarIcon: ({ color, focused }) => (
-              <LiveTabIcon
-                sport={sport}
-                color={color}
-                focused={focused}
-                hasLive={(liveCounts[sport.id] ?? 0) > 0}
-              />
+            title: 'More',
+            href: SPORTS.some(s => !isSelected(s.id)) ? undefined : null,
+            tabBarActiveTintColor: C.accent,
+            tabBarIcon: ({ color }) => (
+              <View style={styles.iconWrap}>
+                <Ionicons name="ellipsis-horizontal" size={22} color={color} />
+                {morHasLive && <View style={styles.liveDot} />}
+              </View>
             ),
           }}
         />
-      ))}
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarActiveTintColor: C.accent,
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="settings-outline" size={22} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: 'Settings',
+            tabBarActiveTintColor: C.accent,
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="settings-outline" size={22} color={color} />
+            ),
+          }}
+        />
+      </Tabs>
     </>
   );
 }
