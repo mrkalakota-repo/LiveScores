@@ -97,11 +97,25 @@ function createStyles(C: ColorScheme) {
       height: '100%',
       backgroundColor: C.background,
     },
-    probPct: {
-      fontSize: 10,
+    probSide: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 3,
+      minWidth: 52,
+    },
+    probSideRight: {
+      justifyContent: 'flex-end',
+    },
+    probAbbrev: {
+      fontSize: 9,
       fontWeight: '700',
       color: C.textMuted,
-      minWidth: 28,
+      letterSpacing: 0.3,
+    },
+    probPct: {
+      fontSize: 10,
+      fontWeight: '800',
+      color: C.textMuted,
     },
     probPctRight: {
       textAlign: 'right',
@@ -163,12 +177,14 @@ export const GameCard = memo(function GameCard({ game }: Props) {
         {/* Win probability bar */}
         {game.winProbability && (
           <View style={styles.probRow}>
-            <Text style={[
-              styles.probPct,
-              game.winProbability.away > game.winProbability.home && { color: C.accent },
-            ]}>
-              {game.winProbability.away}%
-            </Text>
+            <View style={styles.probSide}>
+              <Text style={[styles.probAbbrev, game.winProbability.away > game.winProbability.home && { color: C.accent }]}>
+                {game.awayTeam.abbreviation}
+              </Text>
+              <Text style={[styles.probPct, game.winProbability.away > game.winProbability.home && { color: C.accent }]}>
+                {game.winProbability.away}%
+              </Text>
+            </View>
             <View style={styles.probTrack}>
               <View style={[
                 styles.probFill,
@@ -182,13 +198,14 @@ export const GameCard = memo(function GameCard({ game }: Props) {
                 game.winProbability.home > game.winProbability.away && { backgroundColor: C.accent },
               ]} />
             </View>
-            <Text style={[
-              styles.probPct,
-              styles.probPctRight,
-              game.winProbability.home > game.winProbability.away && { color: C.accent },
-            ]}>
-              {game.winProbability.home}%
-            </Text>
+            <View style={[styles.probSide, styles.probSideRight]}>
+              <Text style={[styles.probPct, game.winProbability.home > game.winProbability.away && { color: C.accent }]}>
+                {game.winProbability.home}%
+              </Text>
+              <Text style={[styles.probAbbrev, game.winProbability.home > game.winProbability.away && { color: C.accent }]}>
+                {game.homeTeam.abbreviation}
+              </Text>
+            </View>
           </View>
         )}
       </View>
