@@ -46,7 +46,6 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Pro
           {team.record}
         </Text>
       )}
-      <View style={styles.spacer} />
       <Text style={[styles.score, { color: scoreColor }]}>
         {isScheduled ? '--' : team.score}
       </Text>
@@ -81,13 +80,14 @@ const styles = StyleSheet.create({
   abbrev: {
     fontSize: 15,
     fontWeight: '600',
-    width: 46,
+    flex: 1,
+    minWidth: 0,
   },
   record: {
     fontSize: 11,
     color: Colors.textMuted,
+    marginRight: 8,
   },
-  spacer: { flex: 1 },
   score: {
     fontSize: 22,
     fontWeight: '800',

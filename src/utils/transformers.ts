@@ -27,9 +27,8 @@ function buildTeam(competitor: EspnCompetitor): TeamInfo {
   if (competitor.athlete) {
     const a = competitor.athlete;
     const displayName = a.fullName ?? a.displayName ?? '?';
-    // Use last name as abbreviation for compact display
-    const parts = displayName.split(' ');
-    const abbreviation = parts[parts.length - 1].slice(0, 6).toUpperCase();
+    // shortName is ESPN's compact form e.g. "T. Schoolkate" — ideal for card display
+    const abbreviation = a.shortName ?? displayName;
     return {
       id: a.id ?? competitor.id,
       abbreviation,
