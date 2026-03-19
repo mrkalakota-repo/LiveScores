@@ -1,7 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { AppError } from '@/api/errors';
 
@@ -35,11 +34,11 @@ export function ErrorScreen({ onRetry, error }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.iconWrap}>
-        <Ionicons name={icon} size={40} color={Colors.live} />
+      <View style={[styles.iconWrap, { backgroundColor: C.liveBackground }]}>
+        <Ionicons name={icon} size={40} color={C.live} />
       </View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+      <Text style={[styles.title, { color: C.textPrimary }]}>{title}</Text>
+      <Text style={[styles.subtitle, { color: C.textSecondary }]}>{subtitle}</Text>
       <Pressable
         style={({ pressed }) => [styles.button, { backgroundColor: C.accent }, pressed && styles.buttonPressed]}
         onPress={onRetry}
@@ -66,19 +65,16 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: Colors.liveBackground,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
   },
   title: {
-    color: Colors.textPrimary,
     fontSize: 17,
     fontWeight: '700',
     textAlign: 'center',
   },
   subtitle: {
-    color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 20,
@@ -93,9 +89,5 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   buttonPressed: { opacity: 0.75 },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 15,
-  },
+  buttonText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

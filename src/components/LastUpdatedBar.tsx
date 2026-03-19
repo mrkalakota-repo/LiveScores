@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import { formatLastUpdated } from '@/utils/dateHelpers';
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
 }
 
 export function LastUpdatedBar({ updatedAt }: Props) {
+  const { C } = useTheme();
   const [, tick] = useState(0);
 
   useEffect(() => {
@@ -18,8 +19,8 @@ export function LastUpdatedBar({ updatedAt }: Props) {
 
   return (
     <View style={styles.bar}>
-      <Ionicons name="time-outline" size={12} color={Colors.textMuted} />
-      <Text style={styles.text}>Updated {formatLastUpdated(updatedAt)}</Text>
+      <Ionicons name="time-outline" size={12} color={C.textMuted} />
+      <Text style={[styles.text, { color: C.textMuted }]}>Updated {formatLastUpdated(updatedAt)}</Text>
     </View>
   );
 }
@@ -32,8 +33,5 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: 6,
   },
-  text: {
-    fontSize: 11,
-    color: Colors.textMuted,
-  },
+  text: { fontSize: 11 },
 });

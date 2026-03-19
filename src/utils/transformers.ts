@@ -112,9 +112,15 @@ export function transformScoreboard(
       const gameStatus = getGameStatus(status);
       let statusText = getStatusText(status, sport);
 
-      // For scheduled games, use human-readable time
+      const gameDate = competition.date ?? event.date;
       if (gameStatus === 'scheduled') {
-        statusText = formatGameTime(competition.date ?? event.date);
+        statusText = formatGameTime(gameDate);
+      } else if (gameStatus === 'final' && gameDate) {
+        const d = new Date(gameDate);
+        if (!isNaN(d.getTime())) {
+          const dateStr = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+          statusText = `Final · ${dateStr}`;
+        }
       }
 
       const homeTeam = buildTeam(home);

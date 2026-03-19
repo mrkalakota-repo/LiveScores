@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
 import { useTheme } from '@/contexts/ThemeContext';
+import type { ColorScheme } from '@/constants/themes';
 import { useGameSummary } from '@/hooks/useGameSummary';
 import { GameDetailHeader } from '@/components/GameDetailHeader';
 import { LineScores } from '@/components/LineScores';
@@ -18,8 +18,204 @@ import { WinProbabilityBar } from '@/components/WinProbabilityBar';
 import { TennisPointBoard } from '@/components/TennisPointBoard';
 import { computeWinProbability } from '@/utils/winProbability';
 
+function createStyles(C: ColorScheme) {
+  return StyleSheet.create({
+    screen: { flex: 1, backgroundColor: C.background },
+    navBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      paddingTop: 56,
+      paddingBottom: 12,
+      backgroundColor: C.background,
+      borderBottomWidth: 1,
+      borderBottomColor: C.border,
+    },
+    backBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 2,
+      minWidth: 70,
+    },
+    backLabel: {
+      color: C.textPrimary,
+      fontSize: 15,
+      fontWeight: '600',
+    },
+    navTitle: {
+      flex: 1,
+      textAlign: 'center',
+      color: C.textPrimary,
+      fontSize: 16,
+      fontWeight: '700',
+      letterSpacing: 0.3,
+    },
+    refreshBtn: { minWidth: 70, alignItems: 'flex-end' },
+    center: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+      paddingHorizontal: 32,
+    },
+    loadingText: { color: C.textSecondary, fontSize: 14 },
+    errorTitle: {
+      color: C.textPrimary,
+      fontSize: 17,
+      fontWeight: '700',
+      textAlign: 'center',
+    },
+    errorSub: { color: C.textSecondary, fontSize: 13, textAlign: 'center' },
+    retryBtn: {
+      paddingHorizontal: 24,
+      paddingVertical: 10,
+      borderRadius: 10,
+      marginTop: 4,
+    },
+    retryText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+    scroll: { flex: 1 },
+    scrollContent: { paddingBottom: 32 },
+    card: {
+      backgroundColor: C.surface,
+      marginHorizontal: 12,
+      marginTop: 12,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: C.border,
+      padding: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: C.isDark ? 0.4 : 0.06,
+      shadowRadius: 10,
+      elevation: 5,
+    },
+    sectionTitle: {
+      fontSize: 10,
+      fontWeight: '800',
+      letterSpacing: 1.5,
+      color: C.accent,
+      marginBottom: 12,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 6,
+    },
+    infoText: { fontSize: 13, color: C.textSecondary, flex: 1 },
+    statsHeader: { flexDirection: 'row', marginBottom: 8 },
+    statsTeamLabel: { fontSize: 13, fontWeight: '700', color: C.accent, width: 52 },
+    statsFlex: { flex: 1 },
+    statRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 6,
+      borderTopWidth: 1,
+      borderTopColor: C.border,
+    },
+    statValue: {
+      width: 52,
+      fontSize: 14,
+      fontWeight: '600',
+      color: C.textPrimary,
+      textAlign: 'left',
+    },
+    statLabel: { flex: 1, fontSize: 12, color: C.textMuted, textAlign: 'center' },
+    playRow: { gap: 6, paddingVertical: 10 },
+    playBorder: { borderTopWidth: 1, borderTopColor: C.border },
+    playMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    playClock: { fontSize: 11, color: C.textMuted, fontWeight: '600' },
+    playTeamBadge: {
+      paddingHorizontal: 7,
+      paddingVertical: 2,
+      borderRadius: 5,
+      backgroundColor: C.surfaceElevated,
+    },
+    playScoreBadge: {
+      backgroundColor: C.scheduledBackground,
+      borderWidth: 1,
+      borderColor: C.scheduledBorder,
+    },
+    playTeamText: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: C.textSecondary,
+      letterSpacing: 0.5,
+    },
+    playScoreText: { color: C.scheduled },
+    playText: { fontSize: 13, color: C.textSecondary, lineHeight: 19 },
+    bottomPad: { height: 20 },
+    // ── Player Stats ───────────────────────────────────────────────────
+    playerGroup: { marginBottom: 12 },
+    playerCatHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 6,
+      borderBottomWidth: 1,
+      borderBottomColor: C.border,
+      marginBottom: 2,
+    },
+    playerCatLabel: {
+      flex: 1,
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.8,
+      color: C.accent,
+    },
+    playerStatLabels: { flexDirection: 'row', gap: 2 },
+    playerColHeader: {
+      width: 44,
+      textAlign: 'right',
+      fontSize: 10,
+      fontWeight: '600',
+      color: C.textMuted,
+      letterSpacing: 0.4,
+    },
+    playerRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 7 },
+    playerBorder: { borderTopWidth: 1, borderTopColor: C.border },
+    playerNameWrap: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      minWidth: 0,
+    },
+    playerTeamBadge: {
+      paddingHorizontal: 5,
+      paddingVertical: 2,
+      borderRadius: 4,
+      borderWidth: 1,
+    },
+    playerTeamHome: {
+      backgroundColor: C.scheduledBackground,
+      borderColor: C.scheduledBorder,
+    },
+    playerTeamAway: {
+      backgroundColor: C.surfaceElevated,
+      borderColor: C.border,
+    },
+    playerTeamText: {
+      fontSize: 9,
+      fontWeight: '700',
+      color: C.textSecondary,
+      letterSpacing: 0.3,
+    },
+    playerJersey: { fontSize: 11, color: C.textMuted, fontWeight: '500', width: 28 },
+    playerName: { flex: 1, fontSize: 13, color: C.textPrimary, fontWeight: '600' },
+    playerStatValues: { flexDirection: 'row', gap: 2 },
+    playerStatVal: {
+      width: 44,
+      textAlign: 'right',
+      fontSize: 13,
+      fontWeight: '700',
+      color: C.textPrimary,
+    },
+  });
+}
+
 export default function GameDetailScreen() {
   const { C } = useTheme();
+  const styles = useMemo(() => createStyles(C), [C]);
   const router = useRouter();
   const { id, sport, league } = useLocalSearchParams<{
     id: string;
@@ -41,11 +237,11 @@ export default function GameDetailScreen() {
   const handleRefetch = useCallback(() => { refetch(); }, [refetch]);
 
   return (
-    <View style={[styles.screen, { backgroundColor: C.background }]}>
+    <View style={styles.screen}>
       {/* Custom back header */}
-      <View style={[styles.navBar, { backgroundColor: C.background, borderBottomColor: C.border }]}>
+      <View style={styles.navBar}>
         <Pressable onPress={handleBack} style={styles.backBtn} hitSlop={12}>
-          <Ionicons name="chevron-back" size={22} color={Colors.textPrimary} />
+          <Ionicons name="chevron-back" size={22} color={C.textPrimary} />
           <Text style={styles.backLabel}>Scores</Text>
         </Pressable>
         <Text style={styles.navTitle}>
@@ -65,7 +261,7 @@ export default function GameDetailScreen() {
 
       {isError && !isLoading && (
         <View style={styles.center}>
-          <Ionicons name="alert-circle-outline" size={44} color={Colors.live} />
+          <Ionicons name="alert-circle-outline" size={44} color={C.live} />
           <Text style={styles.errorTitle}>Could not load game details</Text>
           <Text style={styles.errorSub}>{(error as any)?.message ?? 'Please try again.'}</Text>
           <Pressable style={[styles.retryBtn, { backgroundColor: C.accent }]} onPress={handleRefetch}>
@@ -104,7 +300,7 @@ export default function GameDetailScreen() {
             });
             if (!wp) return null;
             return (
-              <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+              <View style={styles.card}>
                 <WinProbabilityBar
                   homeTeam={data.homeTeam}
                   awayTeam={data.awayTeam}
@@ -116,7 +312,7 @@ export default function GameDetailScreen() {
 
           {/* Tennis point board — live games only */}
           {sport === 'tennis' && data.status === 'live' && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <View style={styles.card}>
               <TennisPointBoard
                 awayTeam={data.awayTeam}
                 homeTeam={data.homeTeam}
@@ -128,7 +324,7 @@ export default function GameDetailScreen() {
 
           {/* Line scores */}
           {(data.homeTeam.linescores?.length ?? 0) > 0 && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <View style={styles.card}>
               <LineScores
                 sport={sport ?? ''}
                 homeTeam={data.homeTeam}
@@ -139,17 +335,17 @@ export default function GameDetailScreen() {
 
           {/* Game info */}
           {(data.venue || data.broadcasts.length > 0) && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Text style={[styles.sectionTitle, { color: C.accent }]}>GAME INFO</Text>
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>GAME INFO</Text>
               {data.venue && (
                 <View style={styles.infoRow}>
-                  <Ionicons name="location-outline" size={14} color={Colors.textMuted} />
+                  <Ionicons name="location-outline" size={14} color={C.textMuted} />
                   <Text style={styles.infoText}>{data.venue}</Text>
                 </View>
               )}
               {data.broadcasts.length > 0 && (
                 <View style={styles.infoRow}>
-                  <Ionicons name="tv-outline" size={14} color={Colors.textMuted} />
+                  <Ionicons name="tv-outline" size={14} color={C.textMuted} />
                   <Text style={styles.infoText}>{data.broadcasts.join(' · ')}</Text>
                 </View>
               )}
@@ -158,12 +354,12 @@ export default function GameDetailScreen() {
 
           {/* Team stats */}
           {(data.homeStats.length > 0 || data.awayStats.length > 0) && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Text style={[styles.sectionTitle, { color: C.accent }]}>TEAM STATS</Text>
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>TEAM STATS</Text>
               <View style={styles.statsHeader}>
-                <Text style={[styles.statsTeamLabel, { color: C.accent }]}>{data.awayTeam.abbreviation}</Text>
+                <Text style={styles.statsTeamLabel}>{data.awayTeam.abbreviation}</Text>
                 <View style={styles.statsFlex} />
-                <Text style={[styles.statsTeamLabel, { color: C.accent }]}>{data.homeTeam.abbreviation}</Text>
+                <Text style={styles.statsTeamLabel}>{data.homeTeam.abbreviation}</Text>
               </View>
               {data.homeStats.map((stat, i) => {
                 const awayStat = data.awayStats[i];
@@ -180,10 +376,9 @@ export default function GameDetailScreen() {
 
           {/* Player stats */}
           {data.playerLines.length > 0 && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Text style={[styles.sectionTitle, { color: C.accent }]}>PLAYER STATS</Text>
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>PLAYER STATS</Text>
               {(() => {
-                // Group lines by category
                 const cats = [...new Set(data.playerLines.map(p => p.category))].filter(Boolean);
                 return cats.map(cat => {
                   const players = data.playerLines.filter(p => p.category === cat);
@@ -191,7 +386,7 @@ export default function GameDetailScreen() {
                   return (
                     <View key={cat} style={styles.playerGroup}>
                       <View style={styles.playerCatHeader}>
-                        <Text style={[styles.playerCatLabel, { color: C.accent }]}>{cat?.toUpperCase()}</Text>
+                        <Text style={styles.playerCatLabel}>{cat?.toUpperCase()}</Text>
                         <View style={styles.playerStatLabels}>
                           {labels.map(lbl => (
                             <Text key={lbl} style={styles.playerColHeader}>{lbl}</Text>
@@ -227,8 +422,8 @@ export default function GameDetailScreen() {
 
           {/* Recent plays */}
           {data.recentPlays.length > 0 && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Text style={[styles.sectionTitle, { color: C.accent }]}>RECENT PLAYS</Text>
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>RECENT PLAYS</Text>
               {data.recentPlays.map((play, i) => (
                 <View key={play.id} style={[styles.playRow, i > 0 && styles.playBorder]}>
                   <View style={styles.playMeta}>
@@ -255,276 +450,3 @@ export default function GameDetailScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  navBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingTop: 56,
-    paddingBottom: 12,
-    backgroundColor: Colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  backBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    minWidth: 70,
-  },
-  backLabel: {
-    color: Colors.textPrimary,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  navTitle: {
-    flex: 1,
-    textAlign: 'center',
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
-  refreshBtn: {
-    minWidth: 70,
-    alignItems: 'flex-end',
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    paddingHorizontal: 32,
-  },
-  loadingText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-  },
-  errorTitle: {
-    color: Colors.textPrimary,
-    fontSize: 17,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  errorSub: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    textAlign: 'center',
-  },
-  retryBtn: {
-    backgroundColor: Colors.accent,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 4,
-  },
-  retryText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 15,
-  },
-  scroll: { flex: 1 },
-  scrollContent: { paddingBottom: 32 },
-  card: {
-    backgroundColor: Colors.surface,
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  sectionTitle: {
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 1.5,
-    color: Colors.accent,
-    marginBottom: 12,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  infoText: {
-    fontSize: 13,
-    color: Colors.textSecondary,
-    flex: 1,
-  },
-  statsHeader: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  statsTeamLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.accent,
-    width: 52,
-  },
-  statsFlex: { flex: 1 },
-  statRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 6,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  statValue: {
-    width: 52,
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textPrimary,
-    textAlign: 'left',
-  },
-  statLabel: {
-    flex: 1,
-    fontSize: 12,
-    color: Colors.textMuted,
-    textAlign: 'center',
-  },
-  playRow: {
-    gap: 6,
-    paddingVertical: 10,
-  },
-  playBorder: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  playMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  playClock: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    fontWeight: '600',
-  },
-  playTeamBadge: {
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 5,
-    backgroundColor: Colors.surfaceElevated,
-  },
-  playScoreBadge: {
-    backgroundColor: Colors.scheduledBackground,
-    borderWidth: 1,
-    borderColor: Colors.scheduledBorder,
-  },
-  playTeamText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Colors.textSecondary,
-    letterSpacing: 0.5,
-  },
-  playScoreText: {
-    color: Colors.scheduled,
-  },
-  playText: {
-    fontSize: 13,
-    color: Colors.textSecondary,
-    lineHeight: 19,
-  },
-  bottomPad: { height: 20 },
-  // ── Player Stats ──────────────────────────────────────────────────────────
-  playerGroup: {
-    marginBottom: 12,
-  },
-  playerCatHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    marginBottom: 2,
-  },
-  playerCatLabel: {
-    flex: 1,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-    color: Colors.accent,
-  },
-  playerStatLabels: {
-    flexDirection: 'row',
-    gap: 2,
-  },
-  playerColHeader: {
-    width: 44,
-    textAlign: 'right',
-    fontSize: 10,
-    fontWeight: '600',
-    color: Colors.textMuted,
-    letterSpacing: 0.4,
-  },
-  playerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 7,
-  },
-  playerBorder: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  playerNameWrap: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    minWidth: 0,
-  },
-  playerTeamBadge: {
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 4,
-    borderWidth: 1,
-  },
-  playerTeamHome: {
-    backgroundColor: Colors.scheduledBackground,
-    borderColor: Colors.scheduledBorder,
-  },
-  playerTeamAway: {
-    backgroundColor: Colors.surfaceElevated,
-    borderColor: Colors.border,
-  },
-  playerTeamText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: Colors.textSecondary,
-    letterSpacing: 0.3,
-  },
-  playerJersey: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    fontWeight: '500',
-    width: 28,
-  },
-  playerName: {
-    flex: 1,
-    fontSize: 13,
-    color: Colors.textPrimary,
-    fontWeight: '600',
-  },
-  playerStatValues: {
-    flexDirection: 'row',
-    gap: 2,
-  },
-  playerStatVal: {
-    width: 44,
-    textAlign: 'right',
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-  },
-});

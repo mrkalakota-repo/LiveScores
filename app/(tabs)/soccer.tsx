@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import { SOCCER_LEAGUES, type SoccerLeague } from '@/constants/sports';
 import { useScoreboard } from '@/hooks/useScoreboard';
 import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
@@ -9,6 +9,7 @@ import { LeagueChipBar } from '@/components/LeagueChipBar';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
 
 export default function SoccerScreen() {
+  const { C } = useTheme();
   const [selectedLeague, setSelectedLeague] = useState<SoccerLeague>(SOCCER_LEAGUES[0]);
   const { data, isLoading, isError, error, isRefetching, refetch, dataUpdatedAt } =
     useScoreboard(selectedLeague.sport, selectedLeague.league);
@@ -21,7 +22,7 @@ export default function SoccerScreen() {
   }, [data, setLiveCount]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: C.background }]}>
       <LeagueChipBar
         leagues={SOCCER_LEAGUES}
         selected={selectedLeague.league}
@@ -43,5 +44,5 @@ export default function SoccerScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1 },
 });

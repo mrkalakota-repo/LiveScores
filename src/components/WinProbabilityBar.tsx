@@ -1,7 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '@/constants/colors';
 import { useTheme } from '@/contexts/ThemeContext';
+import type { ColorScheme } from '@/constants/themes';
 import type { WinProbability } from '@/utils/winProbability';
 import type { TeamInfo } from '@/api/types';
 
@@ -17,12 +17,88 @@ const BASIS_LABEL: Record<WinProbability['basis'], string> = {
   even:   '',
 };
 
+function createStyles(C: ColorScheme) {
+  return StyleSheet.create({
+    header: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      marginBottom: 12,
+    },
+    teamSide: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 6,
+    },
+    teamSideRight: {
+      justifyContent: 'flex-end',
+    },
+    pct: {
+      fontSize: 26,
+      fontWeight: '900',
+      color: C.textMuted,
+      letterSpacing: -0.5,
+    },
+    pctLeading: {
+      color: C.textPrimary,
+    },
+    abbrev: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: C.textMuted,
+      letterSpacing: 0.3,
+      paddingBottom: 2,
+    },
+    abbrevLeading: {
+      color: C.textSecondary,
+    },
+    centerLabel: {
+      fontSize: 9,
+      fontWeight: '800',
+      letterSpacing: 1.2,
+      color: C.textMuted,
+      textAlign: 'center',
+      paddingBottom: 4,
+      paddingHorizontal: 6,
+    },
+    track: {
+      flexDirection: 'row',
+      height: 10,
+      borderRadius: 5,
+      overflow: 'hidden',
+      backgroundColor: C.surfaceElevated,
+    },
+    fill: {
+      height: '100%',
+    },
+    fillAway: {
+      backgroundColor: C.surfaceElevated,
+    },
+    fillHome: {
+      backgroundColor: C.surfaceElevated,
+    },
+    trackDivider: {
+      width: 2,
+      height: '100%',
+      backgroundColor: C.background,
+    },
+    basis: {
+      fontSize: 10,
+      color: C.textMuted,
+      textAlign: 'center',
+      marginTop: 8,
+      letterSpacing: 0.2,
+    },
+  });
+}
+
 export const WinProbabilityBar = memo(function WinProbabilityBar({
   homeTeam,
   awayTeam,
   probability,
 }: Props) {
   const { C } = useTheme();
+  const styles = useMemo(() => createStyles(C), [C]);
   const awayLeading = probability.away > probability.home;
   const homeLeading = probability.home > probability.away;
 
@@ -78,78 +154,4 @@ export const WinProbabilityBar = memo(function WinProbabilityBar({
       ) : null}
     </View>
   );
-});
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    marginBottom: 12,
-  },
-  teamSide: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 6,
-  },
-  teamSideRight: {
-    justifyContent: 'flex-end',
-  },
-  pct: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: Colors.textMuted,
-    letterSpacing: -0.5,
-  },
-  pctLeading: {
-    color: Colors.textPrimary,
-  },
-  abbrev: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.textMuted,
-    letterSpacing: 0.3,
-    paddingBottom: 2,
-  },
-  abbrevLeading: {
-    color: Colors.textSecondary,
-  },
-  centerLabel: {
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 1.2,
-    color: Colors.textMuted,
-    textAlign: 'center',
-    paddingBottom: 4,
-    paddingHorizontal: 6,
-  },
-  track: {
-    flexDirection: 'row',
-    height: 10,
-    borderRadius: 5,
-    overflow: 'hidden',
-    backgroundColor: Colors.surfaceElevated,
-  },
-  fill: {
-    height: '100%',
-  },
-  fillAway: {
-    backgroundColor: Colors.surfaceElevated,
-    borderRightWidth: 0,
-  },
-  fillHome: {
-    backgroundColor: Colors.surfaceElevated,
-  },
-  trackDivider: {
-    width: 2,
-    height: '100%',
-    backgroundColor: Colors.background,
-  },
-  basis: {
-    fontSize: 10,
-    color: Colors.textMuted,
-    textAlign: 'center',
-    marginTop: 8,
-    letterSpacing: 0.2,
-  },
 });

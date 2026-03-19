@@ -1,8 +1,8 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Colors } from '@/constants/colors';
 import { useTheme } from '@/contexts/ThemeContext';
+import type { ColorScheme } from '@/constants/themes';
 import { TeamRow } from './TeamRow';
 import { StatusBadge } from './StatusBadge';
 import type { GameData } from '@/api/types';
@@ -11,8 +11,107 @@ interface Props {
   game: GameData;
 }
 
+function createStyles(C: ColorScheme) {
+  return StyleSheet.create({
+    card: {
+      flexDirection: 'row',
+      backgroundColor: C.surface,
+      marginHorizontal: 12,
+      marginVertical: 5,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: C.border,
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: C.isDark ? 0.5 : 0.08,
+      shadowRadius: 10,
+      elevation: 5,
+    },
+    cardLive: {
+      backgroundColor: C.liveCardBackground,
+      borderColor: C.liveBorder,
+      shadowColor: C.live,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: C.isDark ? 0.35 : 0.15,
+      shadowRadius: 18,
+      elevation: 10,
+    },
+    cardPressed: { opacity: 0.78 },
+    accent: {
+      width: 6,
+      borderTopLeftRadius: 16,
+      borderBottomLeftRadius: 16,
+    },
+    inner: {
+      flex: 1,
+      paddingHorizontal: 14,
+      paddingTop: 10,
+      paddingBottom: 12,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 8,
+    },
+    broadcast: {
+      fontSize: 11,
+      color: C.textMuted,
+      flexShrink: 1,
+      marginLeft: 8,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: C.border,
+      marginVertical: 1,
+      opacity: 0.4,
+    },
+    situation: {
+      fontSize: 11,
+      color: C.textSecondary,
+      marginTop: 7,
+      fontStyle: 'italic',
+      lineHeight: 16,
+    },
+    probRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 9,
+      gap: 6,
+    },
+    probTrack: {
+      flex: 1,
+      height: 4,
+      flexDirection: 'row',
+      borderRadius: 2,
+      overflow: 'hidden',
+      backgroundColor: C.surfaceElevated,
+    },
+    probFill: {
+      height: '100%',
+      backgroundColor: C.border,
+    },
+    probDivider: {
+      width: 1,
+      height: '100%',
+      backgroundColor: C.background,
+    },
+    probPct: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: C.textMuted,
+      minWidth: 28,
+    },
+    probPctRight: {
+      textAlign: 'right',
+    },
+  });
+}
+
 export const GameCard = memo(function GameCard({ game }: Props) {
   const { C } = useTheme();
+  const styles = useMemo(() => createStyles(C), [C]);
   const router = useRouter();
   const accentColor = { live: C.live, halftime: C.halftime, scheduled: C.accent, final: C.border }[game.status] ?? C.border;
   const isLive = game.status === 'live' || game.status === 'halftime';
@@ -28,7 +127,6 @@ export const GameCard = memo(function GameCard({ game }: Props) {
     <Pressable
       style={({ pressed }) => [
         styles.card,
-        { backgroundColor: C.surface, borderColor: C.border },
         isLive && styles.cardLive,
         pressed && styles.cardPressed,
       ]}
@@ -96,100 +194,4 @@ export const GameCard = memo(function GameCard({ game }: Props) {
       </View>
     </Pressable>
   );
-});
-
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    backgroundColor: Colors.surface,
-    marginHorizontal: 12,
-    marginVertical: 5,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  cardLive: {
-    backgroundColor: Colors.liveCardBackground,
-    borderColor: Colors.liveBorder,
-    shadowColor: Colors.live,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.35,
-    shadowRadius: 18,
-    elevation: 10,
-  },
-  cardPressed: { opacity: 0.78 },
-  accent: {
-    width: 6,
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
-  },
-  inner: {
-    flex: 1,
-    paddingHorizontal: 14,
-    paddingTop: 10,
-    paddingBottom: 12,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  broadcast: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    flexShrink: 1,
-    marginLeft: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.border,
-    marginVertical: 1,
-    opacity: 0.4,
-  },
-  situation: {
-    fontSize: 11,
-    color: Colors.textSecondary,
-    marginTop: 7,
-    fontStyle: 'italic',
-    lineHeight: 16,
-  },
-  probRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 9,
-    gap: 6,
-  },
-  probTrack: {
-    flex: 1,
-    height: 4,
-    flexDirection: 'row',
-    borderRadius: 2,
-    overflow: 'hidden',
-    backgroundColor: Colors.surfaceElevated,
-  },
-  probFill: {
-    height: '100%',
-    backgroundColor: Colors.border,
-  },
-  probDivider: {
-    width: 1,
-    height: '100%',
-    backgroundColor: Colors.background,
-  },
-  probPct: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Colors.textMuted,
-    minWidth: 28,
-  },
-  probPctRight: {
-    textAlign: 'right',
-  },
 });

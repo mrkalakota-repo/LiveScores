@@ -72,7 +72,7 @@ describe('transformScoreboard', () => {
     const game = result[0];
     expect(game.id).toBe('comp1');
     expect(game.status).toBe('final');
-    expect(game.statusText).toBe('Final');
+    expect(game.statusText).toMatch(/^Final/);
     expect(game.homeTeam.abbreviation).toBe('HME');
     expect(game.homeTeam.score).toBe('28');
     expect(game.homeTeam.winner).toBe(true);

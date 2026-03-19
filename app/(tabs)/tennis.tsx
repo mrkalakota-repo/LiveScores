@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Colors } from '@/constants/colors';
+
+import { useTheme } from '@/contexts/ThemeContext';
 import { useScoreboard } from '@/hooks/useScoreboard';
 import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
 import { ScoreboardList } from '@/components/ScoreboardList';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
 
 export default function TennisScreen() {
+  const { C } = useTheme();
   const { data, isLoading, isError, error, isRefetching, refetch, dataUpdatedAt } =
     useScoreboard('tennis', 'atp');
   const { setLiveCount } = useLiveGames();
@@ -18,7 +20,7 @@ export default function TennisScreen() {
   }, [data, setLiveCount]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: C.background }]}>
       <ScoreboardList
         games={data ?? []}
         isLoading={isLoading}
@@ -35,5 +37,5 @@ export default function TennisScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1, backgroundColor: '#000' },
 });
