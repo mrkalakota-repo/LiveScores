@@ -70,7 +70,7 @@ describe('transformScoreboard', () => {
     const result = transformScoreboard(makeRawResponse(), 'football', 'nfl');
     expect(result).toHaveLength(1);
     const game = result[0];
-    expect(game.id).toBe('evt1');
+    expect(game.id).toBe('comp1');
     expect(game.status).toBe('final');
     expect(game.statusText).toBe('Final');
     expect(game.homeTeam.abbreviation).toBe('HME');
@@ -96,7 +96,7 @@ describe('transformScoreboard', () => {
     // Only the event with a valid competition should come through
     const result = transformScoreboard(raw, 'tennis', 'atp');
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe('evt1');
+    expect(result[0].id).toBe('comp1');
   });
 
   it('skips events where competitors array lacks home or away', () => {

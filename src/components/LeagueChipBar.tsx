@@ -39,6 +39,8 @@ export const LeagueChipBar = memo(function LeagueChipBar({ leagues, selected, on
 
 const styles = StyleSheet.create({
   scrollView: {
+    flexShrink: 0,
+    flexGrow: 0,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },

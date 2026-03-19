@@ -9,13 +9,18 @@ export interface EspnEvent {
   date: string;
   name: string;
   shortName: string;
-  competitions: EspnCompetition[];
-  status: EspnStatus;
+  competitions?: EspnCompetition[];
+  status?: EspnStatus;
+  // Tennis/individual-sport events nest competitions inside groupings
+  groupings?: Array<{
+    grouping: { id: string; slug: string; displayName: string };
+    competitions: EspnCompetition[];
+  }>;
 }
 
 export interface EspnCompetition {
   id: string;
-  date: string;
+  date?: string;
   venue?: { fullName: string };
   broadcasts?: Array<{ names: string[] }>;
   competitors: EspnCompetitor[];
@@ -34,12 +39,20 @@ export interface EspnCompetition {
 export interface EspnCompetitor {
   id: string;
   homeAway?: string;
-  team: {
-    id: string;
-    abbreviation: string;
-    displayName: string;
+  // Team sports use `team`; individual sports (tennis) use `athlete`
+  team?: {
+    id?: string;
+    abbreviation?: string;
+    displayName?: string;
     logo?: string;
     logos?: Array<{ href: string }>;
+  };
+  athlete?: {
+    id?: string;
+    displayName?: string;
+    shortName?: string;
+    fullName?: string;
+    flag?: { href: string; alt?: string };
   };
   score?: string;
   winner?: boolean;
