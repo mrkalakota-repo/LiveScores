@@ -27,7 +27,6 @@ export default function CricketScreen() {
         selected={selectedLeague.league}
         onSelect={setSelectedLeague}
       />
-      <View style={styles.divider} />
       <ScoreboardList
         games={data ?? []}
         isLoading={isLoading}
@@ -45,5 +44,4 @@ export default function CricketScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  divider: { height: 1, backgroundColor: Colors.border },
 });

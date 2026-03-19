@@ -5,6 +5,7 @@ export interface SportConfig {
   league: string;
   icon: string;        // Ionicons name — focused (filled)
   iconOutline: string; // Ionicons name — unfocused (outline)
+  tabColor: string;    // active tint: icon + label color when this tab is selected
 }
 
 /** Generic league selector entry — used by Soccer, Cricket, etc. */
@@ -19,13 +20,13 @@ export interface LeagueConfig {
 export type SoccerLeague = LeagueConfig;
 
 export const SPORTS: SportConfig[] = [
-  { id: 'nfl',     label: 'NFL',     sport: 'football',   league: 'nfl',         icon: 'american-football',         iconOutline: 'american-football-outline' },
-  { id: 'nba',     label: 'NBA',     sport: 'basketball', league: 'nba',         icon: 'basketball',                iconOutline: 'basketball-outline' },
-  { id: 'mlb',     label: 'MLB',     sport: 'baseball',   league: 'mlb',         icon: 'baseball',                  iconOutline: 'baseball-outline' },
-  { id: 'nhl',     label: 'NHL',     sport: 'hockey',     league: 'nhl',         icon: 'disc',                      iconOutline: 'disc-outline' },
-  { id: 'soccer',  label: 'Soccer',  sport: 'soccer',     league: 'usa.1',       icon: 'football',                  iconOutline: 'football-outline' },
-  { id: 'tennis',  label: 'Tennis',  sport: 'tennis',     league: 'atp',         icon: 'tennisball',                iconOutline: 'tennisball-outline' },
-  { id: 'cricket', label: 'Cricket', sport: 'cricket',    league: 'icc.cricket', icon: 'baseball',                  iconOutline: 'baseball-outline' },
+  { id: 'nfl',     label: 'NFL',     sport: 'football',   league: 'nfl',         icon: 'american-football', iconOutline: 'american-football-outline', tabColor: '#E03A3E' },
+  { id: 'nba',     label: 'NBA',     sport: 'basketball', league: 'nba',         icon: 'basketball',        iconOutline: 'basketball-outline',        tabColor: '#F87131' },
+  { id: 'mlb',     label: 'MLB',     sport: 'baseball',   league: 'mlb',         icon: 'baseball',          iconOutline: 'baseball-outline',          tabColor: '#C8102E' },
+  { id: 'nhl',     label: 'NHL',     sport: 'hockey',     league: 'nhl',         icon: 'disc',              iconOutline: 'disc-outline',              tabColor: '#0085CA' },
+  { id: 'soccer',  label: 'Soccer',  sport: 'soccer',     league: 'usa.1',       icon: 'football',          iconOutline: 'football-outline',          tabColor: '#00A651' },
+  { id: 'tennis',  label: 'Tennis',  sport: 'tennis',     league: 'atp',         icon: 'tennisball',        iconOutline: 'tennisball-outline',        tabColor: '#C9F02A' },
+  { id: 'cricket', label: 'Cricket', sport: 'cricket',    league: 'icc.cricket', icon: 'baseball',          iconOutline: 'baseball-outline',          tabColor: '#00B4D8' },
 ];
 
 export const SOCCER_LEAGUES: LeagueConfig[] = [

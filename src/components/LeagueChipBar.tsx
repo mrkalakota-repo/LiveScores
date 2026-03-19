@@ -14,6 +14,7 @@ export const LeagueChipBar = memo(function LeagueChipBar({ leagues, selected, on
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      style={styles.scrollView}
       contentContainerStyle={styles.container}
     >
       {leagues.map(league => {
@@ -37,9 +38,14 @@ export const LeagueChipBar = memo(function LeagueChipBar({ leagues, selected, on
 });
 
 const styles = StyleSheet.create({
+  scrollView: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
   container: {
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingTop: 8,
+    paddingBottom: 8,
     gap: 8,
     flexDirection: 'row',
   },

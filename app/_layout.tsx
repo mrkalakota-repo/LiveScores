@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-query';
 import { LiveGamesProvider } from '@/contexts/LiveGamesContext';
+import { LiveCountPoller } from '@/components/LiveCountPoller';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,6 +33,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <LiveGamesProvider>
+        <LiveCountPoller />
         <StatusBar style="light" />
         <Stack screenOptions={{ headerShown: false }} />
       </LiveGamesProvider>

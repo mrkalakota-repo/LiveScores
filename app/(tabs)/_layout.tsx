@@ -70,7 +70,6 @@ export default function TabLayout() {
           borderTopWidth: 1,
           height: 56,
         },
-        tabBarActiveTintColor: Colors.tabActive,
         tabBarInactiveTintColor: Colors.tabInactive,
         tabBarLabelStyle: {
           fontSize: 10,
@@ -94,6 +93,7 @@ export default function TabLayout() {
           name={sport.id}
           options={{
             title: sport.label,
+            tabBarActiveTintColor: sport.tabColor,
             tabBarIcon: ({ color, focused }) => (
               <LiveTabIcon
                 name={sport.icon as IoniconName}
