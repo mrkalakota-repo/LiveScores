@@ -86,6 +86,29 @@ describe('transformScoreboard', () => {
     expect(transformScoreboard({ events: [] }, 'football', 'nfl')).toEqual([]);
   });
 
+  it('skips events with missing competitions array', () => {
+    const raw: EspnScoreboardResponse = {
+      events: [
+        { id: 'e1', date: '2024-01-15T18:00:00Z', name: 'A', shortName: 'A', status: makeRawResponse().events[0].status, competitions: [] },
+        makeRawResponse().events[0],
+      ],
+    };
+    // Only the event with a valid competition should come through
+    const result = transformScoreboard(raw, 'tennis', 'atp');
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe('evt1');
+  });
+
+  it('skips events where competitors array lacks home or away', () => {
+    const raw = makeRawResponse();
+    // Remove the away competitor
+    raw.events[0].competitions[0].competitors = raw.events[0].competitions[0].competitors.filter(
+      c => c.homeAway === 'home',
+    );
+    const result = transformScoreboard(raw, 'football', 'nfl');
+    expect(result).toEqual([]);
+  });
+
   it('uses logos array fallback when logo field empty', () => {
     const raw = makeRawResponse();
     raw.events[0].competitions[0].competitors[0].team.logo = '';

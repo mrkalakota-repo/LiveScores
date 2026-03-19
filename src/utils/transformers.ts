@@ -41,12 +41,15 @@ export function transformScoreboard(
 ): GameData[] {
   const events = raw.events ?? [];
 
-  return events.map(event => {
-    const competition = event.competitions[0];
+  return events.flatMap(event => {
+    const competition = event.competitions?.[0];
+    if (!competition) return [];
+
     const status = competition.status ?? event.status;
 
-    const home = competition.competitors.find(c => c.homeAway === 'home')!;
-    const away = competition.competitors.find(c => c.homeAway === 'away')!;
+    const home = competition.competitors?.find(c => c.homeAway === 'home');
+    const away = competition.competitors?.find(c => c.homeAway === 'away');
+    if (!home || !away) return [];
 
     const broadcasts: string[] = [];
     competition.broadcasts?.forEach(b => broadcasts.push(...b.names));
