@@ -55,7 +55,7 @@ export interface EspnCompetitor {
     flag?: { href: string; alt?: string };
   };
   score?: string;
-  winner?: boolean;
+  winner?: boolean | string; // cricket returns "true"/"false" strings
   linescores?: Array<{ value: number }>;
   records?: Array<{ summary: string; type: string }>;
 }

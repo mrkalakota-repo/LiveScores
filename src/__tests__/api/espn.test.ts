@@ -1,17 +1,20 @@
 /**
  * fetchScoreboard tests
  *
- * Approach: mock axios.create to return a fixed object, then spy on .get
- * through the exported espnClient so we control individual test responses.
+ * axios.create is called twice (espnClient + espnWebClient); the factory
+ * returns a single shared instance so both clients use the same get spy.
  */
-jest.mock('axios', () => ({
-  create: jest.fn(() => ({ get: jest.fn() })),
-}));
+jest.mock('axios', () => {
+  const mockInstance = { get: jest.fn() };
+  return { create: jest.fn(() => mockInstance) };
+});
 
-import { fetchScoreboard, espnClient } from '@/api/espn';
+import axios from 'axios';
+import { fetchScoreboard } from '@/api/espn';
 import { AppError } from '@/api/errors';
 
-const mockGet = espnClient.get as jest.Mock;
+// Grab the shared mock get from the shared instance
+const mockGet = (axios.create() as unknown as { get: jest.Mock }).get;
 
 beforeEach(() => {
   mockGet.mockReset();
@@ -57,6 +60,13 @@ describe('fetchScoreboard — happy path', () => {
     mockGet.mockResolvedValueOnce({ data: { events: [] } });
     await expect(fetchScoreboard('soccer', 'usa.1')).resolves.toEqual({ events: [] });
     expect(mockGet).toHaveBeenCalledWith('/soccer/usa.1/scoreboard');
+  });
+
+  it('routes cricket to the web API endpoint', async () => {
+    mockGet.mockResolvedValueOnce({ data: { events: [] } });
+    const result = await fetchScoreboard('cricket', '8048');
+    expect(result).toEqual({ events: [] });
+    expect(mockGet).toHaveBeenCalledWith('/site/v2/sports/cricket/8048/scoreboard');
   });
 
   it('accepts all valid sports', async () => {

@@ -36,7 +36,7 @@ function buildTeam(competitor: EspnCompetitor): TeamInfo {
       displayName,
       logo: getTeamLogo(competitor),
       score: competitor.score ?? '0',
-      winner: competitor.winner ?? false,
+      winner: competitor.winner === true || competitor.winner === 'true',
       record: getRecord(competitor),
       linescores: getLinescores(competitor),
     };
@@ -51,7 +51,7 @@ function buildTeam(competitor: EspnCompetitor): TeamInfo {
     displayName,
     logo: getTeamLogo(competitor),
     score: competitor.score ?? '0',
-    winner: competitor.winner ?? false,
+    winner: competitor.winner === true || competitor.winner === 'true',
     record: getRecord(competitor),
     linescores: getLinescores(competitor),
   };

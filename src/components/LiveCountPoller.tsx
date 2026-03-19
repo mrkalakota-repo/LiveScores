@@ -19,8 +19,11 @@ import type { GameData } from '@/api/types';
 export function LiveCountPoller() {
   const { setLiveCount } = useLiveGames();
 
+  // Cricket uses dynamic league IDs from a discovery endpoint — exclude from static poll
+  const pollableSports = SPORTS.filter(s => s.sport !== 'cricket');
+
   const results = useQueries({
-    queries: SPORTS.map(sport => ({
+    queries: pollableSports.map(sport => ({
       queryKey: ['scoreboard', sport.sport, sport.league],
       queryFn: async (): Promise<GameData[]> => {
         const raw = await fetchScoreboard(sport.sport, sport.league);
@@ -37,7 +40,7 @@ export function LiveCountPoller() {
 
   useEffect(() => {
     results.forEach((result, i) => {
-      const sport = SPORTS[i];
+      const sport = pollableSports[i];
       const count =
         result.data?.filter(g => g.status === 'live' || g.status === 'halftime').length ?? 0;
       setLiveCount(sport.id, count);
