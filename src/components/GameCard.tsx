@@ -3,6 +3,26 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { ColorScheme } from '@/constants/themes';
+
+/**
+ * Extract the in-game point score from a live tennis statusText.
+ * ESPN's shortDetail can be "30-15", "Deuce", "Advantage Federer",
+ * "Set 2, 5-4, 30-15", etc.
+ * Returns a short display string or null when no point score is present.
+ */
+function extractTennisPoint(statusText: string): string | null {
+  // Standard game-point patterns: "30-15", "40:30", "0-40", "AD-40"
+  const scoreMatch = statusText.match(/\b(0|15|30|40|AD|A)\s*[-:]\s*(0|15|30|40|AD|A)\b/i);
+  if (scoreMatch) {
+    const a = scoreMatch[1].toUpperCase().replace(/^A$/, 'AD');
+    const b = scoreMatch[2].toUpperCase().replace(/^A$/, 'AD');
+    return `${a} - ${b}`;
+  }
+  if (/\bdeuce\b/i.test(statusText)) return 'Deuce';
+  const advMatch = statusText.match(/\badv(?:antage)?\s+(.+)/i);
+  if (advMatch) return `Adv. ${advMatch[1].trim()}`;
+  return null;
+}
 import { TeamRow } from './TeamRow';
 import { StatusBadge } from './StatusBadge';
 import type { GameData } from '@/api/types';
@@ -73,6 +93,14 @@ function createStyles(C: ColorScheme) {
       marginTop: 7,
       fontStyle: 'italic',
       lineHeight: 16,
+    },
+    tennisPoint: {
+      fontSize: 13,
+      fontWeight: '800',
+      color: C.live,
+      marginTop: 8,
+      letterSpacing: 0.5,
+      textAlign: 'center',
     },
     probRow: {
       flexDirection: 'row',
@@ -166,6 +194,12 @@ export const GameCard = memo(function GameCard({ game }: Props) {
         <TeamRow team={game.awayTeam} isWinner={game.awayTeam.winner} gameStatus={game.status} />
         <View style={styles.divider} />
         <TeamRow team={game.homeTeam} isWinner={game.homeTeam.winner} gameStatus={game.status} />
+
+        {/* Tennis game-level point score */}
+        {game.sport === 'tennis' && game.status === 'live' && (() => {
+          const pt = extractTennisPoint(game.statusText);
+          return pt ? <Text style={styles.tennisPoint}>{pt}</Text> : null;
+        })()}
 
         {/* Situation (baseball, cricket play-by-play) */}
         {game.situation && (
