@@ -93,19 +93,19 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerStyle: {
-            backgroundColor: Colors.background,
+            backgroundColor: C.background,
             shadowColor: 'transparent',
             borderBottomWidth: 1,
-            borderBottomColor: Colors.border,
+            borderBottomColor: C.border,
           },
-          headerTintColor: Colors.textPrimary,
+          headerTintColor: C.textPrimary,
           headerTitleStyle: {
             fontWeight: '800',
             fontSize: 17,
             letterSpacing: 0.3,
           },
           tabBarStyle: {
-            backgroundColor: Colors.tabBarBackground,
+            backgroundColor: C.tabBarBackground,
             borderTopWidth: 0,
             height: 58,
             shadowColor: '#000',
@@ -114,7 +114,7 @@ export default function TabLayout() {
             shadowRadius: 16,
             elevation: 16,
           },
-          tabBarInactiveTintColor: Colors.tabInactive,
+          tabBarInactiveTintColor: C.tabInactive,
           tabBarLabelStyle: {
             fontSize: 10,
             fontWeight: '700',
@@ -127,7 +127,7 @@ export default function TabLayout() {
           },
           tabBarScrollEnabled: true,
           sceneStyle: {
-            backgroundColor: Colors.background,
+            backgroundColor: C.background,
           },
         }}
       >

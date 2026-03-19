@@ -40,9 +40,9 @@ export default function GameDetailScreen() {
   const handleRefetch = useCallback(() => { refetch(); }, [refetch]);
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: C.background }]}>
       {/* Custom back header */}
-      <View style={styles.navBar}>
+      <View style={[styles.navBar, { backgroundColor: C.background, borderBottomColor: C.border }]}>
         <Pressable onPress={handleBack} style={styles.backBtn} hitSlop={12}>
           <Ionicons name="chevron-back" size={22} color={Colors.textPrimary} />
           <Text style={styles.backLabel}>Scores</Text>
@@ -103,7 +103,7 @@ export default function GameDetailScreen() {
             });
             if (!wp) return null;
             return (
-              <View style={styles.card}>
+              <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
                 <WinProbabilityBar
                   homeTeam={data.homeTeam}
                   awayTeam={data.awayTeam}
@@ -115,7 +115,7 @@ export default function GameDetailScreen() {
 
           {/* Line scores */}
           {(data.homeTeam.linescores?.length ?? 0) > 0 && (
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
               <LineScores
                 sport={sport ?? ''}
                 homeTeam={data.homeTeam}
@@ -126,7 +126,7 @@ export default function GameDetailScreen() {
 
           {/* Game info */}
           {(data.venue || data.broadcasts.length > 0) && (
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
               <Text style={[styles.sectionTitle, { color: C.accent }]}>GAME INFO</Text>
               {data.venue && (
                 <View style={styles.infoRow}>
@@ -145,7 +145,7 @@ export default function GameDetailScreen() {
 
           {/* Team stats */}
           {(data.homeStats.length > 0 || data.awayStats.length > 0) && (
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
               <Text style={[styles.sectionTitle, { color: C.accent }]}>TEAM STATS</Text>
               <View style={styles.statsHeader}>
                 <Text style={[styles.statsTeamLabel, { color: C.accent }]}>{data.awayTeam.abbreviation}</Text>
@@ -167,7 +167,7 @@ export default function GameDetailScreen() {
 
           {/* Player stats */}
           {data.playerLines.length > 0 && (
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
               <Text style={[styles.sectionTitle, { color: C.accent }]}>PLAYER STATS</Text>
               {(() => {
                 // Group lines by category
@@ -214,7 +214,7 @@ export default function GameDetailScreen() {
 
           {/* Recent plays */}
           {data.recentPlays.length > 0 && (
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
               <Text style={[styles.sectionTitle, { color: C.accent }]}>RECENT PLAYS</Text>
               {data.recentPlays.map((play, i) => (
                 <View key={play.id} style={[styles.playRow, i > 0 && styles.playBorder]}>

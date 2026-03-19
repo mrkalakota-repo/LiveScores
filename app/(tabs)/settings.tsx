@@ -10,7 +10,7 @@ import type { ThemeName } from '@/constants/themes';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-const THEME_NAMES: ThemeName[] = ['electric', 'emerald', 'sunset'];
+const THEME_NAMES: ThemeName[] = ['carbon', 'midnight', 'ember'];
 
 export default function SettingsScreen() {
   const { themeName, setTheme, C } = useTheme();
@@ -18,7 +18,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: C.background }]}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
@@ -36,7 +36,7 @@ export default function SettingsScreen() {
               key={sport.id}
               style={({ pressed }) => [
                 styles.sportRow,
-                active && { borderColor: sport.tabColor + '60' },
+                { backgroundColor: C.surface, borderColor: active ? sport.tabColor + '60' : C.border },
                 pressed && styles.rowPressed,
               ]}
               onPress={() => toggle(sport.id)}
@@ -87,21 +87,32 @@ export default function SettingsScreen() {
               key={name}
               style={({ pressed }) => [
                 styles.themeRow,
-                isActive && { borderColor: C.accent },
+                { backgroundColor: meta.bg, borderColor: isActive ? meta.preview : meta.bg },
                 pressed && styles.rowPressed,
               ]}
               onPress={() => setTheme(name)}
               accessibilityRole="radio"
               accessibilityState={{ checked: isActive }}
             >
-              <View style={[styles.themePreview, { backgroundColor: meta.preview }]} />
+              {/* Mini colour palette dots */}
+              <View style={styles.themeDots}>
+                <View style={[styles.themeDot, { backgroundColor: meta.preview }]} />
+                <View style={[styles.themeDot, styles.themeDotSmall, { backgroundColor: meta.preview, opacity: 0.45 }]} />
+                <View style={[styles.themeDot, styles.themeDotSmall, { backgroundColor: meta.preview, opacity: 0.2 }]} />
+              </View>
               <View style={styles.themeMeta}>
-                <Text style={[styles.themeLabel, isActive && { color: C.accent }]}>
+                <Text style={[styles.themeLabel, { color: meta.preview }]}>
                   {meta.label}
                 </Text>
-                <Text style={styles.themeDesc}>{meta.description}</Text>
+                <Text style={[styles.themeDesc, { color: meta.preview, opacity: 0.55 }]}>
+                  {meta.description}
+                </Text>
               </View>
-              {isActive && <View style={[styles.checkDot, { backgroundColor: C.accent }]} />}
+              {isActive && (
+                <View style={[styles.checkCircle, { borderColor: meta.preview }]}>
+                  <View style={[styles.checkFill, { backgroundColor: meta.preview }]} />
+                </View>
+              )}
             </Pressable>
           );
         })}
@@ -186,32 +197,48 @@ const styles = StyleSheet.create({
   themeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: 16,
-    gap: 14,
+    borderRadius: 16,
+    borderWidth: 2,
+    padding: 18,
+    gap: 16,
   },
-  themePreview: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  themeDots: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  themeDot: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+  },
+  themeDotSmall: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
   themeMeta: {
     flex: 1,
-    gap: 3,
+    gap: 4,
   },
   themeLabel: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: Colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 0.3,
   },
   themeDesc: {
     fontSize: 12,
-    color: Colors.textMuted,
+    fontWeight: '500',
   },
-  checkDot: {
+  checkCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkFill: {
     width: 10,
     height: 10,
     borderRadius: 5,

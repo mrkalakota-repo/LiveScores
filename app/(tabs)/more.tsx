@@ -20,7 +20,7 @@ export default function MoreScreen() {
   const hiddenSports = SPORTS.filter(s => !isSelected(s.id));
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: C.background }]}>
       <Text style={styles.heading}>MORE SPORTS</Text>
       <View style={styles.list}>
         {hiddenSports.map(sport => {
@@ -28,7 +28,7 @@ export default function MoreScreen() {
           return (
             <Pressable
               key={sport.id}
-              style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+              style={({ pressed }) => [styles.row, { backgroundColor: C.surface, borderColor: C.border }, pressed && styles.rowPressed]}
               onPress={() => router.navigate(`/(tabs)/${sport.id}` as any)}
               accessibilityRole="button"
               accessibilityLabel={`Go to ${sport.label}`}
