@@ -1,22 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { SPORTS } from '@/constants/sports';
+import type { SportConfig } from '@/constants/sports';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 interface LiveTabIconProps {
-  name: IoniconName;
-  nameOutline: IoniconName;
+  sport: SportConfig;
   color: string;
   focused: boolean;
   hasLive: boolean;
 }
 
-function LiveTabIcon({ name, nameOutline, color, focused, hasLive }: LiveTabIconProps) {
+function LiveTabIcon({ sport, color, focused, hasLive }: LiveTabIconProps) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -35,10 +36,15 @@ function LiveTabIcon({ name, nameOutline, color, focused, hasLive }: LiveTabIcon
   }, [hasLive, focused, pulseAnim]);
 
   const iconColor = !focused && hasLive ? Colors.tabLive : color;
+  const iconName = focused ? sport.icon : sport.iconOutline;
 
   return (
     <View style={styles.iconWrap}>
-      <Ionicons name={focused ? name : nameOutline} size={22} color={iconColor} />
+      {sport.iconFamily === 'MaterialCommunityIcons' ? (
+        <MaterialCommunityIcons name={iconName as MCIName} size={22} color={iconColor} />
+      ) : (
+        <Ionicons name={iconName as IoniconName} size={22} color={iconColor} />
+      )}
       {!focused && hasLive && (
         <Animated.View style={[styles.liveDot, { opacity: pulseAnim }]} />
       )}
@@ -66,14 +72,19 @@ export default function TabLayout() {
         },
         tabBarStyle: {
           backgroundColor: Colors.tabBarBackground,
-          borderTopColor: Colors.border,
-          borderTopWidth: 1,
-          height: 56,
+          borderTopWidth: 0,
+          height: 58,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -6 },
+          shadowOpacity: 0.5,
+          shadowRadius: 16,
+          elevation: 16,
         },
         tabBarInactiveTintColor: Colors.tabInactive,
         tabBarLabelStyle: {
           fontSize: 10,
-          fontWeight: '600',
+          fontWeight: '700',
+          letterSpacing: 0.3,
         },
         // Fixed width per item so no tab ever wraps its label to a second line
         tabBarItemStyle: {
@@ -96,8 +107,7 @@ export default function TabLayout() {
             tabBarActiveTintColor: sport.tabColor,
             tabBarIcon: ({ color, focused }) => (
               <LiveTabIcon
-                name={sport.icon as IoniconName}
-                nameOutline={sport.iconOutline as IoniconName}
+                sport={sport}
                 color={color}
                 focused={focused}
                 hasLive={(liveCounts[sport.id] ?? 0) > 0}

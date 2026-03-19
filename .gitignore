@@ -33,6 +33,9 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Store credentials — never commit
+google-play-key.json
+
 # typescript
 *.tsbuildinfo
 

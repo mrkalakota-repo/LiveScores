@@ -62,6 +62,11 @@ const styles = StyleSheet.create({
   chipActive: {
     backgroundColor: Colors.chipActive,
     borderColor: Colors.chipActiveBorder,
+    shadowColor: Colors.accent,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 6,
   },
   chipInactive: {
     backgroundColor: Colors.chipInactive,

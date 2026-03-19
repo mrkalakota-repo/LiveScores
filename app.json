@@ -13,9 +13,13 @@
       "backgroundColor": "#1668d4"
     },
     "ios": {
+      "bundleIdentifier": "com.mrkalakota.livescores",
+      "buildNumber": "1",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.mrkalakota.livescores",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#1668d4",
         "foregroundImage": "./assets/android-icon-foreground.png",
