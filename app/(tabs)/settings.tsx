@@ -10,7 +10,7 @@ import type { ThemeName } from '@/constants/themes';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-const THEME_NAMES: ThemeName[] = ['carbon', 'midnight', 'ember'];
+const THEME_NAMES: ThemeName[] = ['carbon', 'midnight', 'ember', 'frost', 'linen'];
 
 export default function SettingsScreen() {
   const { themeName, setTheme, C } = useTheme();
@@ -23,8 +23,8 @@ export default function SettingsScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* ── Sport Picker ─────────────────────────────────────────────── */}
-      <Text style={styles.sectionLabel}>MY SPORTS</Text>
-      <Text style={styles.sectionHint}>
+      <Text style={[styles.sectionLabel, { color: C.textMuted }]}>MY SPORTS</Text>
+      <Text style={[styles.sectionHint, { color: C.textMuted }]}>
         Selected sports appear as tabs. The rest are in the ··· menu.
       </Text>
       <View style={styles.sportList}>
@@ -44,30 +44,30 @@ export default function SettingsScreen() {
               accessibilityRole="checkbox"
               accessibilityState={{ checked: active, disabled: isLast }}
             >
-              <View style={[styles.sportIconBox, { borderColor: sport.tabColor + '40' }]}>
+              <View style={[styles.sportIconBox, { backgroundColor: C.surfaceElevated, borderColor: sport.tabColor + '40' }]}>
                 {sport.iconFamily === 'MaterialCommunityIcons' ? (
                   <MaterialCommunityIcons
                     name={sport.iconOutline as MCIName}
                     size={22}
-                    color={active ? sport.tabColor : Colors.textMuted}
+                    color={active ? sport.tabColor : C.textMuted}
                   />
                 ) : (
                   <Ionicons
                     name={sport.iconOutline as IoniconName}
                     size={22}
-                    color={active ? sport.tabColor : Colors.textMuted}
+                    color={active ? sport.tabColor : C.textMuted}
                   />
                 )}
               </View>
 
-              <Text style={[styles.sportLabel, active && { color: Colors.textPrimary }]}>
+              <Text style={[styles.sportLabel, { color: active ? C.textPrimary : C.textMuted }]}>
                 {sport.label}
               </Text>
 
               {isLast ? (
-                <Ionicons name="lock-closed-outline" size={16} color={Colors.textMuted} />
+                <Ionicons name="lock-closed-outline" size={16} color={C.textMuted} />
               ) : (
-                <View style={[styles.checkbox, active && { backgroundColor: sport.tabColor, borderColor: sport.tabColor }]}>
+                <View style={[styles.checkbox, { borderColor: C.border }, active && { backgroundColor: sport.tabColor, borderColor: sport.tabColor }]}>
                   {active && <Ionicons name="checkmark" size={13} color="#000" />}
                 </View>
               )}
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
       </View>
 
       {/* ── Color Theme ──────────────────────────────────────────────── */}
-      <Text style={[styles.sectionLabel, styles.sectionLabelSpaced]}>COLOR THEME</Text>
+      <Text style={[styles.sectionLabel, styles.sectionLabelSpaced, { color: C.textMuted }]}>COLOR THEME</Text>
       <View style={styles.themeList}>
         {THEME_NAMES.map(name => {
           const meta = THEME_META[name];
@@ -101,10 +101,10 @@ export default function SettingsScreen() {
                 <View style={[styles.themeDot, styles.themeDotSmall, { backgroundColor: meta.preview, opacity: 0.2 }]} />
               </View>
               <View style={styles.themeMeta}>
-                <Text style={[styles.themeLabel, { color: meta.preview }]}>
+                <Text style={[styles.themeLabel, { color: meta.textColor }]}>
                   {meta.label}
                 </Text>
-                <Text style={[styles.themeDesc, { color: meta.preview, opacity: 0.55 }]}>
+                <Text style={[styles.themeDesc, { color: meta.textColor, opacity: 0.6 }]}>
                   {meta.description}
                 </Text>
               </View>

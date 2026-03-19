@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { GameStatus, TeamInfo } from '@/api/types';
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
 }
 
 export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Props) {
+  const { C } = useTheme();
   const isFinal = gameStatus === 'final';
   const isScheduled = gameStatus === 'scheduled';
 
@@ -18,13 +19,13 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Pro
   const isSetScore = !isScheduled && team.score.includes(' ');
 
   const nameColor = isFinal
-    ? isWinner ? Colors.winner : Colors.loser
-    : Colors.textPrimary;
+    ? isWinner ? C.winner : C.loser
+    : C.textPrimary;
 
   const scoreColor = isFinal
-    ? isWinner ? Colors.winnerScore : Colors.loserScore
-    : isScheduled ? Colors.textMuted
-    : Colors.textPrimary;
+    ? isWinner ? C.winnerScore : C.loserScore
+    : isScheduled ? C.textMuted
+    : C.textPrimary;
 
   return (
     <View style={styles.row}>
@@ -37,15 +38,15 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Pro
           recyclingKey={team.id}
         />
       ) : (
-        <View style={styles.logoPlaceholder}>
-          <Text style={styles.logoInitial}>{team.abbreviation.charAt(0)}</Text>
+        <View style={[styles.logoPlaceholder, { backgroundColor: C.surfaceElevated }]}>
+          <Text style={[styles.logoInitial, { color: C.textMuted }]}>{team.abbreviation.charAt(0)}</Text>
         </View>
       )}
       <Text style={[styles.abbrev, { color: nameColor }]} numberOfLines={1}>
         {team.abbreviation}
       </Text>
       {team.record && (
-        <Text style={styles.record} numberOfLines={1}>
+        <Text style={[styles.record, { color: C.textMuted }]} numberOfLines={1}>
           {team.record}
         </Text>
       )}
@@ -71,14 +72,12 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: Colors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoInitial: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.textMuted,
   },
   abbrev: {
     fontSize: 15,
@@ -89,7 +88,6 @@ const styles = StyleSheet.create({
   },
   record: {
     fontSize: 11,
-    color: Colors.textMuted,
     marginRight: 8,
   },
   score: {

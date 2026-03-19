@@ -15,6 +15,7 @@ import { useGameSummary } from '@/hooks/useGameSummary';
 import { GameDetailHeader } from '@/components/GameDetailHeader';
 import { LineScores } from '@/components/LineScores';
 import { WinProbabilityBar } from '@/components/WinProbabilityBar';
+import { TennisPointBoard } from '@/components/TennisPointBoard';
 import { computeWinProbability } from '@/utils/winProbability';
 
 export default function GameDetailScreen() {
@@ -112,6 +113,18 @@ export default function GameDetailScreen() {
               </View>
             );
           })()}
+
+          {/* Tennis point board — live games only */}
+          {sport === 'tennis' && data.status === 'live' && (
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+              <TennisPointBoard
+                awayTeam={data.awayTeam}
+                homeTeam={data.homeTeam}
+                statusText={data.statusText}
+                recentPlays={data.recentPlays}
+              />
+            </View>
+          )}
 
           {/* Line scores */}
           {(data.homeTeam.linescores?.length ?? 0) > 0 && (
