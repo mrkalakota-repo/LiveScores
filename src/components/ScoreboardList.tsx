@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { Platform, RefreshControl, SectionList, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import { groupGamesIntoSections } from '@/utils/transformers';
 import { GameCard } from './GameCard';
 import { LoadingScreen } from './LoadingScreen';
@@ -33,6 +34,7 @@ export function ScoreboardList({
   updatedAt,
   sport,
 }: Props) {
+  const { C } = useTheme();
   const sections = useMemo(() => groupGamesIntoSections(games), [games]);
 
   const renderItem = useCallback(
@@ -43,11 +45,11 @@ export function ScoreboardList({
   const renderSectionHeader = useCallback(
     ({ section }: { section: { title: string } }) => (
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{section.title}</Text>
-        <View style={styles.sectionLine} />
+        <Text style={[styles.sectionTitle, { color: C.accent }]}>{section.title}</Text>
+        <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
       </View>
     ),
-    [],
+    [C],
   );
 
   if (isLoading) return <LoadingScreen />;
@@ -78,8 +80,8 @@ export function ScoreboardList({
             <RefreshControl
               refreshing={isRefetching}
               onRefresh={onRefresh}
-              tintColor={Colors.scheduled}
-              colors={[Colors.scheduled]}
+              tintColor={C.scheduled}
+              colors={[C.scheduled]}
             />
           ) : undefined
         }
@@ -107,12 +109,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1.5,
-    color: Colors.accent,
   },
   sectionLine: {
     flex: 1,
     height: 1,
-    backgroundColor: Colors.accent,
     opacity: 0.2,
   },
   footer: {

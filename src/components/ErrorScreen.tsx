@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { AppError } from '@/api/errors';
 
 interface Props {
@@ -29,6 +30,7 @@ function resolveDisplay(error?: AppError | Error | null): { icon: React.Componen
 }
 
 export function ErrorScreen({ onRetry, error }: Props) {
+  const { C } = useTheme();
   const { icon, title, subtitle } = resolveDisplay(error);
 
   return (
@@ -39,7 +41,7 @@ export function ErrorScreen({ onRetry, error }: Props) {
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
       <Pressable
-        style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+        style={({ pressed }) => [styles.button, { backgroundColor: C.accent }, pressed && styles.buttonPressed]}
         onPress={onRetry}
         accessibilityRole="button"
         accessibilityLabel="Retry loading scores"
@@ -85,7 +87,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: Colors.accent,
     paddingHorizontal: 24,
     paddingVertical: 11,
     borderRadius: 10,

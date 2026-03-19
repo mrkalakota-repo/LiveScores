@@ -14,6 +14,9 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Pro
   const isFinal = gameStatus === 'final';
   const isScheduled = gameStatus === 'scheduled';
 
+  // Tennis set scores come through as "6 3 7" — space-separated games per set
+  const isSetScore = !isScheduled && team.score.includes(' ');
+
   const nameColor = isFinal
     ? isWinner ? Colors.winner : Colors.loser
     : Colors.textPrimary;
@@ -46,7 +49,7 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Pro
           {team.record}
         </Text>
       )}
-      <Text style={[styles.score, { color: scoreColor }]}>
+      <Text style={[styles.score, isSetScore && styles.scoreSet, { color: scoreColor }]}>
         {isScheduled ? '--' : team.score}
       </Text>
     </View>
@@ -95,5 +98,11 @@ const styles = StyleSheet.create({
     minWidth: 40,
     textAlign: 'right',
     letterSpacing: -0.5,
+  },
+  scoreSet: {
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 3,
+    minWidth: 52,
   },
 });
