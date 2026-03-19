@@ -3,10 +3,10 @@ import { getGameStatus, getStatusText } from './statusHelpers';
 import { formatGameTime } from './dateHelpers';
 
 function getTeamLogo(competitor: EspnCompetitor): string {
-  if (competitor.team.logo) return competitor.team.logo;
-  if (competitor.team.logos && competitor.team.logos.length > 0) {
-    return competitor.team.logos[0].href;
-  }
+  const team = competitor.team ?? {};
+  if ((team as { logo?: string }).logo) return (team as { logo: string }).logo;
+  const logos = (team as { logos?: Array<{ href: string }> }).logos;
+  if (logos && logos.length > 0) return logos[0].href;
   return '';
 }
 
@@ -22,10 +22,15 @@ function getLinescores(competitor: EspnCompetitor): number[] | undefined {
 }
 
 function buildTeam(competitor: EspnCompetitor): TeamInfo {
+  const team = competitor.team ?? {};
+  const abbreviation = (team as { abbreviation?: string }).abbreviation
+    ?? (team as { shortDisplayName?: string }).shortDisplayName
+    ?? '?';
+  const displayName = (team as { displayName?: string }).displayName ?? abbreviation;
   return {
-    id: competitor.team.id,
-    abbreviation: competitor.team.abbreviation,
-    displayName: competitor.team.displayName,
+    id: (team as { id?: string }).id ?? abbreviation,
+    abbreviation,
+    displayName,
     logo: getTeamLogo(competitor),
     score: competitor.score ?? '0',
     winner: competitor.winner ?? false,
@@ -47,8 +52,12 @@ export function transformScoreboard(
 
     const status = competition.status ?? event.status;
 
-    const home = competition.competitors?.find(c => c.homeAway === 'home');
-    const away = competition.competitors?.find(c => c.homeAway === 'away');
+    const competitors = competition.competitors ?? [];
+    if (competitors.length < 2) return [];
+    const home = competitors.find(c => c.homeAway === 'home') ?? competitors[0];
+    const away = competitors.find(c => c.homeAway === 'away')
+      ?? competitors.find(c => c !== home)
+      ?? competitors[1];
     if (!home || !away) return [];
 
     const broadcasts: string[] = [];

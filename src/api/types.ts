@@ -33,7 +33,7 @@ export interface EspnCompetition {
 
 export interface EspnCompetitor {
   id: string;
-  homeAway: 'home' | 'away';
+  homeAway?: string;
   team: {
     id: string;
     abbreviation: string;
@@ -99,7 +99,7 @@ export interface EspnSummaryResponse {
       venue?: { fullName?: string };
       status?: EspnStatus;
       competitors?: Array<{
-        homeAway: 'home' | 'away';
+        homeAway?: string;
         team: { abbreviation: string; displayName: string; logo?: string; logos?: Array<{ href: string }> };
         score?: string;
         winner?: boolean;
