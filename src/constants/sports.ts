@@ -3,7 +3,8 @@ export interface SportConfig {
   label: string;
   sport: string;
   league: string;
-  icon: string; // Ionicons name
+  icon: string;        // Ionicons name — focused (filled)
+  iconOutline: string; // Ionicons name — unfocused (outline)
 }
 
 /** Generic league selector entry — used by Soccer, Cricket, etc. */
@@ -18,13 +19,13 @@ export interface LeagueConfig {
 export type SoccerLeague = LeagueConfig;
 
 export const SPORTS: SportConfig[] = [
-  { id: 'nfl',     label: 'NFL',     sport: 'football',   league: 'nfl',           icon: 'american-football' },
-  { id: 'nba',     label: 'NBA',     sport: 'basketball', league: 'nba',           icon: 'basketball' },
-  { id: 'mlb',     label: 'MLB',     sport: 'baseball',   league: 'mlb',           icon: 'baseball' },
-  { id: 'nhl',     label: 'NHL',     sport: 'hockey',     league: 'nhl',           icon: 'snow' },
-  { id: 'soccer',  label: 'Soccer',  sport: 'soccer',     league: 'usa.1',         icon: 'football' },
-  { id: 'tennis',  label: 'Tennis',  sport: 'tennis',     league: 'atp',           icon: 'tennisball' },
-  { id: 'cricket', label: 'Cricket', sport: 'cricket',    league: 'icc.cricket',   icon: 'baseball-outline' },
+  { id: 'nfl',     label: 'NFL',     sport: 'football',   league: 'nfl',         icon: 'american-football',         iconOutline: 'american-football-outline' },
+  { id: 'nba',     label: 'NBA',     sport: 'basketball', league: 'nba',         icon: 'basketball',                iconOutline: 'basketball-outline' },
+  { id: 'mlb',     label: 'MLB',     sport: 'baseball',   league: 'mlb',         icon: 'baseball',                  iconOutline: 'baseball-outline' },
+  { id: 'nhl',     label: 'NHL',     sport: 'hockey',     league: 'nhl',         icon: 'disc',                      iconOutline: 'disc-outline' },
+  { id: 'soccer',  label: 'Soccer',  sport: 'soccer',     league: 'usa.1',       icon: 'football',                  iconOutline: 'football-outline' },
+  { id: 'tennis',  label: 'Tennis',  sport: 'tennis',     league: 'atp',         icon: 'tennisball',                iconOutline: 'tennisball-outline' },
+  { id: 'cricket', label: 'Cricket', sport: 'cricket',    league: 'icc.cricket', icon: 'baseball',                  iconOutline: 'baseball-outline' },
 ];
 
 export const SOCCER_LEAGUES: LeagueConfig[] = [

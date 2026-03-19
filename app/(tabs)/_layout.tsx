@@ -10,12 +10,13 @@ type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
 interface LiveTabIconProps {
   name: IoniconName;
+  nameOutline: IoniconName;
   color: string;
   focused: boolean;
   hasLive: boolean;
 }
 
-function LiveTabIcon({ name, color, focused, hasLive }: LiveTabIconProps) {
+function LiveTabIcon({ name, nameOutline, color, focused, hasLive }: LiveTabIconProps) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -37,7 +38,7 @@ function LiveTabIcon({ name, color, focused, hasLive }: LiveTabIconProps) {
 
   return (
     <View style={styles.iconWrap}>
-      <Ionicons name={name} size={22} color={iconColor} />
+      <Ionicons name={focused ? name : nameOutline} size={22} color={iconColor} />
       {!focused && hasLive && (
         <Animated.View style={[styles.liveDot, { opacity: pulseAnim }]} />
       )}
@@ -96,6 +97,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <LiveTabIcon
                 name={sport.icon as IoniconName}
+                nameOutline={sport.iconOutline as IoniconName}
                 color={color}
                 focused={focused}
                 hasLive={(liveCounts[sport.id] ?? 0) > 0}

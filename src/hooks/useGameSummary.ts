@@ -4,7 +4,7 @@ import { classifyError } from '@/api/errors';
 import { getGameStatus, getStatusText } from '@/utils/statusHelpers';
 import { formatGameTime } from '@/utils/dateHelpers';
 import type { AppError } from '@/api/errors';
-import type { GameStatus, Play, StatLine, TeamInfo } from '@/api/types';
+import type { GameStatus, Play, PlayerLine, StatLine, TeamInfo } from '@/api/types';
 
 // Re-poll every 20s for live games, otherwise every 2 minutes
 const LIVE_INTERVAL = 20_000;
@@ -47,6 +47,7 @@ export interface GameSummaryData {
   homeStats: StatLine[];
   awayStats: StatLine[];
   recentPlays: Play[];
+  playerLines: PlayerLine[];  // top players from both teams, grouped by category
 }
 
 export function useGameSummary(
@@ -106,6 +107,43 @@ export function useGameSummary(
         }))
         .filter(p => p.text.trim().length > 0);
 
+      // Player lines — top performer per category per team
+      const CATEGORY_LABELS: Record<string, string> = {
+        passing: 'Passing', rushing: 'Rushing', receiving: 'Receiving',
+        defensive: 'Defense', kicking: 'Kicking', punting: 'Punting',
+        goalkeeping: 'GK', batting: 'Batting', bowling: 'Bowling',
+        scoring: 'Scoring', rebounds: 'Rebounds', assists: 'Assists',
+      };
+      const MAX_STAT_COLS = 4;
+      const playerLines: PlayerLine[] = [];
+
+      (raw.boxscore?.players ?? []).forEach(teamPlayers => {
+        const abbrev = teamPlayers.team.abbreviation;
+        (teamPlayers.statistics ?? []).forEach(catGroup => {
+          const categoryLabel = CATEGORY_LABELS[catGroup.name] ?? catGroup.name;
+          const labels = catGroup.labels ?? [];
+          // Take top 2 athletes per category (sorted by first stat descending)
+          const athletes = [...(catGroup.athletes ?? [])]
+            .sort((a, b) => parseFloat(b.stats[0] ?? '0') - parseFloat(a.stats[0] ?? '0'))
+            .slice(0, 2);
+          athletes.forEach(a => {
+            const statCols = labels
+              .slice(0, MAX_STAT_COLS)
+              .map((lbl, i) => ({ label: lbl, value: a.stats[i] ?? '-' }))
+              .filter(s => s.value !== '0' && s.value !== '-');
+            if (statCols.length === 0) return;
+            playerLines.push({
+              id: a.athlete.id,
+              name: a.athlete.displayName,
+              jersey: a.athlete.jersey,
+              teamAbbrev: abbrev,
+              category: categoryLabel,
+              stats: statCols,
+            });
+          });
+        });
+      });
+
       return {
         homeTeam: buildTeamFromSummary(home),
         awayTeam: buildTeamFromSummary(away),
@@ -116,6 +154,7 @@ export function useGameSummary(
         homeStats: extractStats(home.team.abbreviation),
         awayStats: extractStats(away.team.abbreviation),
         recentPlays,
+        playerLines,
       };
     },
     // Poll fast for live/halftime games, slower otherwise

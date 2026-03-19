@@ -61,31 +61,37 @@ export function ScoreboardList({
   if (games.length === 0) return <EmptyState sport={sport} />;
 
   return (
-    <SectionList
-      sections={sections}
-      keyExtractor={item => item.id}
-      renderItem={renderItem}
-      renderSectionHeader={renderSectionHeader}
-      ListHeaderComponent={updatedAt > 0 ? <LastUpdatedBar updatedAt={updatedAt} /> : null}
-      ListFooterComponent={<View style={styles.footer} />}
-      contentContainerStyle={styles.content}
-      stickySectionHeadersEnabled={false}
-      removeClippedSubviews
-      refreshControl={
-        Platform.OS !== 'web' ? (
-          <RefreshControl
-            refreshing={isRefetching}
-            onRefresh={onRefresh}
-            tintColor={Colors.scheduled}
-            colors={[Colors.scheduled]}
-          />
-        ) : undefined
-      }
-    />
+    <View style={styles.flex}>
+      {updatedAt > 0 && <LastUpdatedBar updatedAt={updatedAt} />}
+      <SectionList
+        style={styles.flex}
+        sections={sections}
+        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        ListFooterComponent={<View style={styles.footer} />}
+        contentContainerStyle={styles.content}
+        stickySectionHeadersEnabled={false}
+        removeClippedSubviews
+        refreshControl={
+          Platform.OS !== 'web' ? (
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={onRefresh}
+              tintColor={Colors.scheduled}
+              colors={[Colors.scheduled]}
+            />
+          ) : undefined
+        }
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   content: {
     paddingBottom: 16,
   },

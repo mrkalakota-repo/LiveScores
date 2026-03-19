@@ -114,6 +114,18 @@ export interface EspnSummaryResponse {
       team: { abbreviation: string };
       statistics?: Array<{ name: string; displayValue: string; label?: string }>;
     }>;
+    players?: Array<{
+      team: { abbreviation: string };
+      statistics?: Array<{
+        name: string;   // e.g. "passing", "rushing"
+        keys?: string[];
+        labels?: string[];
+        athletes?: Array<{
+          athlete: { id: string; displayName: string; jersey?: string };
+          stats: string[];
+        }>;
+      }>;
+    }>;
   };
   plays?: Array<{
     id?: string;
@@ -128,6 +140,22 @@ export interface EspnSummaryResponse {
 export interface StatLine {
   label: string;
   value: string;
+}
+
+/** A single stat column for one player (e.g. "YDS: 312") */
+export interface PlayerStatColumn {
+  label: string;
+  value: string;
+}
+
+/** One player's row — name + up to 4 key stats */
+export interface PlayerLine {
+  id: string;
+  name: string;
+  jersey?: string;
+  teamAbbrev: string;
+  category: string;   // "Passing", "Rushing", "Receiving", etc.
+  stats: PlayerStatColumn[];
 }
 
 export interface Play {

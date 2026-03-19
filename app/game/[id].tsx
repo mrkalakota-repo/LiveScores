@@ -133,6 +133,53 @@ export default function GameDetailScreen() {
             </View>
           )}
 
+          {/* Player stats */}
+          {data.playerLines.length > 0 && (
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>PLAYER STATS</Text>
+              {(() => {
+                // Group lines by category
+                const cats = [...new Set(data.playerLines.map(p => p.category))];
+                return cats.map(cat => {
+                  const players = data.playerLines.filter(p => p.category === cat);
+                  const labels = players[0]?.stats.map(s => s.label) ?? [];
+                  return (
+                    <View key={cat} style={styles.playerGroup}>
+                      <View style={styles.playerCatHeader}>
+                        <Text style={styles.playerCatLabel}>{cat.toUpperCase()}</Text>
+                        <View style={styles.playerStatLabels}>
+                          {labels.map(lbl => (
+                            <Text key={lbl} style={styles.playerColHeader}>{lbl}</Text>
+                          ))}
+                        </View>
+                      </View>
+                      {players.map((player, i) => (
+                        <View key={player.id} style={[styles.playerRow, i > 0 && styles.playerBorder]}>
+                          <View style={styles.playerNameWrap}>
+                            <View style={[styles.playerTeamBadge,
+                              player.teamAbbrev === data.homeTeam.abbreviation
+                                ? styles.playerTeamHome : styles.playerTeamAway]}>
+                              <Text style={styles.playerTeamText}>{player.teamAbbrev}</Text>
+                            </View>
+                            {player.jersey && (
+                              <Text style={styles.playerJersey}>#{player.jersey}</Text>
+                            )}
+                            <Text style={styles.playerName} numberOfLines={1}>{player.name}</Text>
+                          </View>
+                          <View style={styles.playerStatValues}>
+                            {player.stats.map(s => (
+                              <Text key={s.label} style={styles.playerStatVal}>{s.value}</Text>
+                            ))}
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  );
+                });
+              })()}
+            </View>
+          )}
+
           {/* Recent plays */}
           {data.recentPlays.length > 0 && (
             <View style={styles.card}>
@@ -340,4 +387,94 @@ const styles = StyleSheet.create({
     lineHeight: 19,
   },
   bottomPad: { height: 20 },
+  // ── Player Stats ──────────────────────────────────────────────────────────
+  playerGroup: {
+    marginBottom: 12,
+  },
+  playerCatHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    marginBottom: 2,
+  },
+  playerCatLabel: {
+    flex: 1,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    color: Colors.accent,
+  },
+  playerStatLabels: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  playerColHeader: {
+    width: 44,
+    textAlign: 'right',
+    fontSize: 10,
+    fontWeight: '600',
+    color: Colors.textMuted,
+    letterSpacing: 0.4,
+  },
+  playerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 7,
+  },
+  playerBorder: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  playerNameWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minWidth: 0,
+  },
+  playerTeamBadge: {
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+  },
+  playerTeamHome: {
+    backgroundColor: Colors.scheduledBackground,
+    borderColor: Colors.scheduledBorder,
+  },
+  playerTeamAway: {
+    backgroundColor: Colors.surfaceElevated,
+    borderColor: Colors.border,
+  },
+  playerTeamText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
+  playerJersey: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    fontWeight: '500',
+    width: 28,
+  },
+  playerName: {
+    flex: 1,
+    fontSize: 13,
+    color: Colors.textPrimary,
+    fontWeight: '600',
+  },
+  playerStatValues: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  playerStatVal: {
+    width: 44,
+    textAlign: 'right',
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+  },
 });
