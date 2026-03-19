@@ -6,9 +6,7 @@ import { formatGameTime } from '@/utils/dateHelpers';
 import type { AppError } from '@/api/errors';
 import type { GameData, GameStatus, Play, PlayerLine, StatLine, TeamInfo } from '@/api/types';
 
-// Re-poll every 20s for live games, otherwise every 2 minutes
 const LIVE_INTERVAL = 20_000;
-const IDLE_INTERVAL = 120_000;
 
 type SummaryCompetitor = NonNullable<
   NonNullable<NonNullable<import('@/api/types').EspnSummaryResponse['header']>['competitions']>[0]['competitors']
@@ -66,6 +64,29 @@ export interface GameSummaryData {
   playerLines: PlayerLine[];  // top players from both teams, grouped by category
 }
 
+// Box score stats — key sport-relevant stats only
+const STAT_KEYS = ['passingYards', 'rushingYards', 'receivingYards', 'totalYards',
+  'points', 'fieldGoalsMade', 'threePointersMade', 'rebounds', 'assists',
+  'hits', 'runs', 'errors', 'saves', 'shots', 'fouls'];
+
+const CATEGORY_LABELS: Record<string, string> = {
+  passing: 'Passing', rushing: 'Rushing', receiving: 'Receiving',
+  defensive: 'Defense', kicking: 'Kicking', punting: 'Punting',
+  goalkeeping: 'GK', batting: 'Batting', bowling: 'Bowling',
+  scoring: 'Scoring', rebounds: 'Rebounds', assists: 'Assists',
+};
+
+const MAX_STAT_COLS = 4;
+
+function extractStats(raw: import('@/api/types').EspnSummaryResponse, abbrev: string): StatLine[] {
+  const team = raw.boxscore?.teams?.find(t => t.team.abbreviation === abbrev);
+  if (!team?.statistics) return [];
+  return team.statistics
+    .filter(s => STAT_KEYS.includes(s.name) || s.label)
+    .slice(0, 8)
+    .map(s => ({ label: s.label ?? s.name, value: s.displayValue }));
+}
+
 export function useGameSummary(
   sport: string,
   league: string,
@@ -102,20 +123,6 @@ export function useGameSummary(
         const broadcasts: string[] = [];
         competition.broadcasts?.forEach(b => { if (b.names) broadcasts.push(...b.names); });
 
-        // Box score stats — key sport-relevant stats only
-        const STAT_KEYS = ['passingYards', 'rushingYards', 'receivingYards', 'totalYards',
-          'points', 'fieldGoalsMade', 'threePointersMade', 'rebounds', 'assists',
-          'hits', 'runs', 'errors', 'saves', 'shots', 'fouls'];
-
-        function extractStats(abbrev: string): StatLine[] {
-          const team = raw.boxscore?.teams?.find(t => t.team.abbreviation === abbrev);
-          if (!team?.statistics) return [];
-          return team.statistics
-            .filter(s => STAT_KEYS.includes(s.name) || s.label)
-            .slice(0, 8)
-            .map(s => ({ label: s.label ?? s.name, value: s.displayValue }));
-        }
-
         // Recent plays — last 8, most recent first
         const recentPlays: Play[] = (raw.plays ?? [])
           .slice(-8)
@@ -130,13 +137,6 @@ export function useGameSummary(
           .filter(p => p.text.trim().length > 0);
 
         // Player lines — top performer per category per team
-        const CATEGORY_LABELS: Record<string, string> = {
-          passing: 'Passing', rushing: 'Rushing', receiving: 'Receiving',
-          defensive: 'Defense', kicking: 'Kicking', punting: 'Punting',
-          goalkeeping: 'GK', batting: 'Batting', bowling: 'Bowling',
-          scoring: 'Scoring', rebounds: 'Rebounds', assists: 'Assists',
-        };
-        const MAX_STAT_COLS = 4;
         const playerLines: PlayerLine[] = [];
 
         (raw.boxscore?.players ?? []).forEach(teamPlayers => {
@@ -175,8 +175,8 @@ export function useGameSummary(
           statusText,
           venue: competition.venue?.fullName,
           broadcasts,
-          homeStats: extractStats((home.team as { abbreviation?: string })?.abbreviation ?? ''),
-          awayStats: extractStats((away.team as { abbreviation?: string })?.abbreviation ?? ''),
+          homeStats: extractStats(raw, buildTeamFromSummary(home).abbreviation),
+          awayStats: extractStats(raw, buildTeamFromSummary(away).abbreviation),
           recentPlays,
           playerLines,
         };

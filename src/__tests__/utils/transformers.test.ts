@@ -1,4 +1,4 @@
-import { transformScoreboard, sortGames, groupGamesIntoSections } from '@/utils/transformers';
+import { transformScoreboard, groupGamesIntoSections } from '@/utils/transformers';
 import type { EspnScoreboardResponse, GameData } from '@/api/types';
 
 function makeRawResponse(overrides: Partial<EspnScoreboardResponse> = {}): EspnScoreboardResponse {
@@ -139,53 +139,6 @@ describe('transformScoreboard', () => {
   it('extracts overall record', () => {
     const [game] = transformScoreboard(makeRawResponse(), 'football', 'nfl');
     expect(game.homeTeam.record).toBe('10-5');
-  });
-});
-
-// ── sortGames ──────────────────────────────────────────────────────────────
-
-describe('sortGames', () => {
-  const makeGame = (status: GameData['status'], startTime: string): GameData => ({
-    id: startTime,
-    sport: 'football',
-    league: 'nfl',
-    status,
-    statusText: '',
-    startTime,
-    broadcasts: [],
-    homeTeam: { id: 'h', abbreviation: 'H', displayName: 'Home', logo: '', score: '0', winner: false },
-    awayTeam: { id: 'a', abbreviation: 'A', displayName: 'Away', logo: '', score: '0', winner: false },
-  });
-
-  it('orders live → scheduled → final', () => {
-    const games = [
-      makeGame('final', '2024-01-15T20:00:00Z'),
-      makeGame('scheduled', '2024-01-15T21:00:00Z'),
-      makeGame('live', '2024-01-15T19:00:00Z'),
-    ];
-    const sorted = sortGames(games);
-    expect(sorted.map(g => g.status)).toEqual(['live', 'scheduled', 'final']);
-  });
-
-  it('sorts within same status by start time', () => {
-    const games = [
-      makeGame('scheduled', '2024-01-15T22:00:00Z'),
-      makeGame('scheduled', '2024-01-15T19:00:00Z'),
-      makeGame('scheduled', '2024-01-15T20:00:00Z'),
-    ];
-    const sorted = sortGames(games);
-    expect(sorted.map(g => g.id)).toEqual([
-      '2024-01-15T19:00:00Z',
-      '2024-01-15T20:00:00Z',
-      '2024-01-15T22:00:00Z',
-    ]);
-  });
-
-  it('does not mutate the original array', () => {
-    const games = [makeGame('final', '2024-01-15T20:00:00Z'), makeGame('live', '2024-01-15T19:00:00Z')];
-    const original = [...games];
-    sortGames(games);
-    expect(games).toEqual(original);
   });
 });
 

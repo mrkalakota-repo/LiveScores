@@ -9,6 +9,7 @@ import type { GameData } from '@/api/types';
 export function useScoreboard(sport: string, league: string) {
   return useQuery<GameData[], AppError>({
     queryKey: ['scoreboard', sport, league],
+    enabled: sport !== '' && league !== '',
     queryFn: async () => {
       const raw = await fetchScoreboard(sport, league);
       return transformScoreboard(raw, sport, league);

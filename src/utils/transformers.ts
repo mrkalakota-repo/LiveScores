@@ -121,16 +121,6 @@ export function transformScoreboard(
   });
 }
 
-// Sort games: live first, then by start time (scheduled), then final
-export function sortGames(games: GameData[]): GameData[] {
-  const order: Record<string, number> = { live: 0, halftime: 1, scheduled: 2, final: 3 };
-  return [...games].sort((a, b) => {
-    const statusDiff = (order[a.status] ?? 4) - (order[b.status] ?? 4);
-    if (statusDiff !== 0) return statusDiff;
-    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
-  });
-}
-
 // Group games into sections for SectionList
 export interface GameSection {
   title: string;

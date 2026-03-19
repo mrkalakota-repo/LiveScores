@@ -44,7 +44,7 @@ export default function CricketScreen() {
   }
 
   // No active leagues today
-  if (!leaguesLoading && (!leagues || leagues.length === 0)) {
+  if (!leagues || leagues.length === 0) {
     return (
       <View style={styles.center}>
         <Text style={styles.emptyText}>No cricket matches today</Text>

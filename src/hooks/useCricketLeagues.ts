@@ -10,7 +10,7 @@ import type { LeagueConfig } from '@/constants/sports';
  */
 export function useCricketLeagues() {
   return useQuery<LeagueConfig[], AppError>({
-    queryKey: ['cricket-leagues'],
+    queryKey: ['cricket-leagues', new Date().toISOString().slice(0, 10)],
     queryFn: fetchCricketLeagues,
     // Refresh every 10 min — leagues don't change often within a day
     staleTime: 10 * 60_000,
