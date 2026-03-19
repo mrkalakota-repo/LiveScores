@@ -8,8 +8,8 @@ export const Colors = {
 
   // ── Typography ─────────────────────────────────────────────────────────────
   textPrimary: '#ffffff',
-  textSecondary: '#8a9ab8',
-  textMuted: '#3d4f6e',
+  textSecondary: '#aab8d0',
+  textMuted: '#627a98',
 
   // ── Status: Live ───────────────────────────────────────────────────────────
   live: '#ff2d55',
@@ -23,7 +23,7 @@ export const Colors = {
   halftimeBorder: '#7a4800',
 
   // ── Status: Final ──────────────────────────────────────────────────────────
-  final: '#48586e',
+  final: '#627a98',
   finalBackground: '#0d0d0d',
   finalBorder: '#1e1e1e',
 
@@ -34,13 +34,13 @@ export const Colors = {
 
   // ── Game Results ───────────────────────────────────────────────────────────
   winner: '#ffffff',
-  loser: '#3d4f6e',
+  loser: '#627a98',
   winnerScore: '#34c759',
-  loserScore: '#3d4f6e',
+  loserScore: '#627a98',
 
   // ── Navigation ─────────────────────────────────────────────────────────────
   tabActive: '#00c8ff',
-  tabInactive: '#3d4f6e',
+  tabInactive: '#627a98',
   tabLive: '#ff2d55',
   tabBarBackground: '#050505',
 
@@ -50,7 +50,7 @@ export const Colors = {
   chipActiveText: '#ffffff',
   chipInactive: '#0d0d0d',
   chipInactiveBorder: '#1e1e1e',
-  chipInactiveText: '#8a9ab8',
+  chipInactiveText: '#aab8d0',
 
   // ── Misc ───────────────────────────────────────────────────────────────────
   divider: '#141414',

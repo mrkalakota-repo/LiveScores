@@ -9,9 +9,10 @@ interface TeamColProps {
   team: TeamInfo;
   gameStatus: GameStatus;
   align: 'left' | 'right';
+  isTennis?: boolean;
 }
 
-const TeamCol = memo(function TeamCol({ team, gameStatus, align }: TeamColProps) {
+const TeamCol = memo(function TeamCol({ team, gameStatus, align, isTennis }: TeamColProps) {
   const isFinal = gameStatus === 'final';
   const isScheduled = gameStatus === 'scheduled';
   const nameColor = isFinal ? (team.winner ? Colors.winner : Colors.loser) : Colors.textPrimary;
@@ -34,6 +35,9 @@ const TeamCol = memo(function TeamCol({ team, gameStatus, align }: TeamColProps)
       <Text style={[styles.score, { color: scoreColor }]}>
         {isScheduled ? '--' : team.score}
       </Text>
+      {isTennis && !isScheduled && (
+        <Text style={styles.setsLabel}>SETS</Text>
+      )}
     </View>
   );
 });
@@ -43,6 +47,7 @@ interface Props {
   awayTeam: TeamInfo;
   status: GameStatus;
   statusText: string;
+  sport?: string;
 }
 
 export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayTeam, status, statusText }: Props) {
@@ -122,5 +127,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textMuted,
     fontWeight: '600',
+  },
+  setsLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
+    color: Colors.textMuted,
+    marginTop: 2,
   },
 });

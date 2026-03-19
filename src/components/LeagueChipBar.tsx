@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { LeagueConfig } from '@/constants/sports';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export const LeagueChipBar = memo(function LeagueChipBar({ leagues, selected, onSelect }: Props) {
+  const { C } = useTheme();
   return (
     <ScrollView
       horizontal
@@ -22,7 +24,9 @@ export const LeagueChipBar = memo(function LeagueChipBar({ leagues, selected, on
         return (
           <Pressable
             key={league.id}
-            style={[styles.chip, isActive ? styles.chipActive : styles.chipInactive]}
+            style={[styles.chip, isActive
+              ? [styles.chipActive, { backgroundColor: C.chipActive, borderColor: C.chipActiveBorder, shadowColor: C.accent }]
+              : styles.chipInactive]}
             onPress={() => onSelect(league)}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}

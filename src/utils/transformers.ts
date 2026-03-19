@@ -1,6 +1,7 @@
 import type { EspnScoreboardResponse, EspnEvent, EspnCompetition, EspnCompetitor, GameData, TeamInfo } from '@/api/types';
 import { getGameStatus, getStatusText } from './statusHelpers';
 import { formatGameTime } from './dateHelpers';
+import { computeWinProbability } from './winProbability';
 
 function getTeamLogo(competitor: EspnCompetitor): string {
   // Individual sport: use country flag from athlete
@@ -22,6 +23,18 @@ function getLinescores(competitor: EspnCompetitor): number[] | undefined {
   return competitor.linescores.map(l => l.value);
 }
 
+/**
+ * Tennis `competitor.score` is sets won (e.g. "2"), not useful on its own.
+ * Build a display score from linescores (games per set): "6 3 7".
+ * Falls back to the raw score string only when linescores are absent.
+ */
+function buildTennisScore(competitor: EspnCompetitor): string {
+  if (competitor.linescores && competitor.linescores.length > 0) {
+    return competitor.linescores.map(l => String(l.value)).join(' ');
+  }
+  return competitor.score ?? '0';
+}
+
 function buildTeam(competitor: EspnCompetitor): TeamInfo {
   // Individual sport (tennis): build from athlete field
   if (competitor.athlete) {
@@ -34,7 +47,7 @@ function buildTeam(competitor: EspnCompetitor): TeamInfo {
       abbreviation,
       displayName,
       logo: getTeamLogo(competitor),
-      score: competitor.score ?? '0',
+      score: buildTennisScore(competitor),
       winner: competitor.winner === true || competitor.winner === 'true',
       record: getRecord(competitor),
       linescores: getLinescores(competitor),
@@ -104,18 +117,32 @@ export function transformScoreboard(
         statusText = formatGameTime(competition.date ?? event.date);
       }
 
+      const homeTeam = buildTeam(home);
+      const awayTeam = buildTeam(away);
+
       return [{
         id: competition.id,
         sport,
         league,
-        homeTeam: buildTeam(home),
-        awayTeam: buildTeam(away),
+        homeTeam,
+        awayTeam,
         status: gameStatus,
         statusText,
         startTime: competition.date ?? event.date,
         venue: competition.venue?.fullName,
         broadcasts,
         situation,
+        winProbability: computeWinProbability({
+          homeScore: homeTeam.score,
+          awayScore: awayTeam.score,
+          homeRecord: homeTeam.record,
+          awayRecord: awayTeam.record,
+          homeStats: [],
+          awayStats: [],
+          status: gameStatus,
+          statusText,
+          sport,
+        }),
       }];
     });
   });

@@ -3,12 +3,40 @@ import { Animated, StyleSheet, View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import { SPORTS } from '@/constants/sports';
 import type { SportConfig } from '@/constants/sports';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
+import { useCricketLeagues } from '@/hooks/useCricketLeagues';
+import { useScoreboard } from '@/hooks/useScoreboard';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+
+/**
+ * Runs in the layout (always mounted) so the cricket live-dot appears
+ * without the user having to visit the cricket tab first.
+ * Tab screens are lazy-loaded by Expo Router, so without this the cricket
+ * screen never mounts and setLiveCount is never called.
+ */
+function CricketLiveTracker() {
+  const { data: leagues } = useCricketLeagues();
+  const firstLeague = leagues?.[0];
+  const { data } = useScoreboard(
+    firstLeague?.sport ?? 'cricket',
+    firstLeague?.league ?? '',   // empty until leagues load → query stays disabled
+  );
+  const { setLiveCount } = useLiveGames();
+
+  useEffect(() => {
+    if (data !== undefined) {
+      const count = data.filter(g => g.status === 'live' || g.status === 'halftime').length;
+      setLiveCount('cricket', count);
+    }
+  }, [data, setLiveCount]);
+
+  return null;
+}
 
 interface LiveTabIconProps {
   sport: SportConfig;
@@ -54,9 +82,12 @@ function LiveTabIcon({ sport, color, focused, hasLive }: LiveTabIconProps) {
 
 export default function TabLayout() {
   const { liveCounts } = useLiveGames();
+  const { C } = useTheme();
 
   return (
-    <Tabs
+    <>
+      <CricketLiveTracker />
+      <Tabs
       screenOptions={{
         headerStyle: {
           backgroundColor: Colors.background,
@@ -116,7 +147,18 @@ export default function TabLayout() {
           }}
         />
       ))}
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarActiveTintColor: C.accent,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings-outline" size={22} color={color} />
+          ),
+        }}
+      />
     </Tabs>
+    </>
   );
 }
 

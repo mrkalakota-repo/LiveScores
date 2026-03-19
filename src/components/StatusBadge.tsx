@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, memo } from 'react';
+import React, { useEffect, useRef, memo, useMemo } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { GameStatus } from '@/api/types';
 
 interface Props {
@@ -8,14 +8,8 @@ interface Props {
   statusText: string;
 }
 
-const STATUS_STYLES: Record<GameStatus, { badge: object; text: object; dotColor?: string }> = {
-  live: { badge: { backgroundColor: Colors.liveBackground, borderColor: Colors.liveBorder }, text: { color: Colors.live }, dotColor: Colors.live },
-  halftime: { badge: { backgroundColor: Colors.halftimeBackground, borderColor: Colors.halftimeBorder }, text: { color: Colors.halftime } },
-  final: { badge: { backgroundColor: Colors.finalBackground, borderColor: Colors.finalBorder }, text: { color: Colors.final } },
-  scheduled: { badge: { backgroundColor: Colors.scheduledBackground, borderColor: Colors.scheduledBorder }, text: { color: Colors.scheduled } },
-};
-
 export const StatusBadge = memo(function StatusBadge({ status, statusText }: Props) {
+  const { C } = useTheme();
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -30,14 +24,21 @@ export const StatusBadge = memo(function StatusBadge({ status, statusText }: Pro
     return () => anim.stop();
   }, [status, opacity]);
 
-  const { badge, text, dotColor } = STATUS_STYLES[status];
+  const statusColors = useMemo(() => ({
+    live:      { badge: { backgroundColor: C.liveBackground, borderColor: C.liveBorder },         text: C.live,      dot: C.live },
+    halftime:  { badge: { backgroundColor: C.halftimeBackground, borderColor: C.halftimeBorder }, text: C.halftime,  dot: undefined },
+    final:     { badge: { backgroundColor: C.finalBackground, borderColor: C.finalBorder },       text: C.final,     dot: undefined },
+    scheduled: { badge: { backgroundColor: C.scheduledBackground, borderColor: C.scheduledBorder }, text: C.scheduled, dot: undefined },
+  }), [C]);
+
+  const { badge, text, dot } = statusColors[status];
 
   return (
     <View style={[styles.badge, badge]}>
-      {status === 'live' && dotColor && (
-        <Animated.View style={[styles.dot, { backgroundColor: dotColor, opacity }]} />
+      {status === 'live' && dot && (
+        <Animated.View style={[styles.dot, { backgroundColor: dot, opacity }]} />
       )}
-      <Text style={[styles.text, text]} numberOfLines={1}>
+      <Text style={[styles.text, { color: text }]} numberOfLines={1}>
         {statusText}
       </Text>
     </View>

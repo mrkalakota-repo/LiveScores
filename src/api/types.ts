@@ -79,6 +79,12 @@ export interface EspnStatus {
 
 export type GameStatus = 'scheduled' | 'live' | 'halftime' | 'final';
 
+export interface WinProbability {
+  home: number;   // 0–100 integer
+  away: number;   // 0–100 integer
+  basis: 'score' | 'record' | 'even';
+}
+
 export interface TeamInfo {
   id: string;
   abbreviation: string;
@@ -102,6 +108,7 @@ export interface GameData {
   venue?: string;
   broadcasts: string[];
   situation?: string;
+  winProbability?: WinProbability | null;
 }
 
 // ── ESPN Summary API types ───────────────────────────────────────────────────

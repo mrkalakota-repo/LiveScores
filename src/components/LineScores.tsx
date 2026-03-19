@@ -27,6 +27,8 @@ function periodLabels(sport: string, count: number): string[] {
       return Array.from({ length: count }, (_, i) => String(i + 1));
     case 'cricket':
       return Array.from({ length: count }, (_, i) => `Inn ${i + 1}`);
+    case 'tennis':
+      return Array.from({ length: count }, (_, i) => `S${i + 1}`);
     default:
       return Array.from({ length: count }, (_, i) => String(i + 1));
   }
@@ -39,11 +41,13 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
 
   if (periodCount === 0) return null;
 
+  const isTennis = sport === 'tennis';
   const labels = periodLabels(sport, periodCount);
+  const totalLabel = isTennis ? 'SETS' : 'T';
 
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.sectionTitle}>LINE SCORE</Text>
+      <Text style={styles.sectionTitle}>{isTennis ? 'SET SCORES' : 'LINE SCORE'}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View>
           {/* Header row */}
@@ -52,32 +56,42 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
             {labels.map(lbl => (
               <Text key={lbl} style={[styles.cell, styles.headerCell]}>{lbl}</Text>
             ))}
-            <Text style={[styles.totalCell, styles.headerCell]}>T</Text>
+            <Text style={[styles.totalCell, styles.headerCell]}>{totalLabel}</Text>
           </View>
 
           {/* Away row */}
           <View style={[styles.row, styles.dataRow]}>
             <Text style={[styles.teamAbbrev, styles.teamLabel]}>{awayTeam.abbreviation}</Text>
-            {labels.map((_, i) => (
-              <Text key={i} style={styles.cell}>
-                {awayLS[i] !== undefined ? String(awayLS[i]) : '-'}
-              </Text>
-            ))}
+            {labels.map((_, i) => {
+              const av = awayLS[i];
+              const hv = homeLS[i];
+              const awayWinsSet = isTennis && av !== undefined && hv !== undefined && av > hv;
+              return (
+                <Text key={i} style={[styles.cell, awayWinsSet && styles.setWinner]}>
+                  {av !== undefined ? String(av) : '-'}
+                </Text>
+              );
+            })}
             <Text style={[styles.totalCell, awayTeam.winner && styles.winnerTotal]}>
-              {awayTeam.score}
+              {isTennis ? String(awayLS.filter((v, i) => v > (homeLS[i] ?? 0)).length) : awayTeam.score}
             </Text>
           </View>
 
           {/* Home row */}
           <View style={[styles.row, styles.dataRow]}>
             <Text style={[styles.teamAbbrev, styles.teamLabel]}>{homeTeam.abbreviation}</Text>
-            {labels.map((_, i) => (
-              <Text key={i} style={styles.cell}>
-                {homeLS[i] !== undefined ? String(homeLS[i]) : '-'}
-              </Text>
-            ))}
+            {labels.map((_, i) => {
+              const hv = homeLS[i];
+              const av = awayLS[i];
+              const homeWinsSet = isTennis && hv !== undefined && av !== undefined && hv > av;
+              return (
+                <Text key={i} style={[styles.cell, homeWinsSet && styles.setWinner]}>
+                  {hv !== undefined ? String(hv) : '-'}
+                </Text>
+              );
+            })}
             <Text style={[styles.totalCell, homeTeam.winner && styles.winnerTotal]}>
-              {homeTeam.score}
+              {isTennis ? String(homeLS.filter((v, i) => v > (awayLS[i] ?? 0)).length) : homeTeam.score}
             </Text>
           </View>
         </View>
@@ -136,6 +150,10 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   winnerTotal: {
+    color: Colors.winnerScore,
+  },
+  setWinner: {
+    fontWeight: '900',
     color: Colors.winnerScore,
   },
 });

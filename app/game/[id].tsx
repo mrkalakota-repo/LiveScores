@@ -10,11 +10,15 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useGameSummary } from '@/hooks/useGameSummary';
 import { GameDetailHeader } from '@/components/GameDetailHeader';
 import { LineScores } from '@/components/LineScores';
+import { WinProbabilityBar } from '@/components/WinProbabilityBar';
+import { computeWinProbability } from '@/utils/winProbability';
 
 export default function GameDetailScreen() {
+  const { C } = useTheme();
   const router = useRouter();
   const { id, sport, league } = useLocalSearchParams<{
     id: string;
@@ -33,6 +37,8 @@ export default function GameDetailScreen() {
     else router.replace('/');
   }, [router]);
 
+  const handleRefetch = useCallback(() => { refetch(); }, [refetch]);
+
   return (
     <View style={styles.screen}>
       {/* Custom back header */}
@@ -44,14 +50,14 @@ export default function GameDetailScreen() {
         <Text style={styles.navTitle}>
           {sport ? sport.charAt(0).toUpperCase() + sport.slice(1) : 'Game'}
         </Text>
-        <Pressable onPress={refetch} style={styles.refreshBtn} hitSlop={12}>
-          <Ionicons name="refresh-outline" size={20} color={Colors.accent} />
+        <Pressable onPress={handleRefetch} style={styles.refreshBtn} hitSlop={12}>
+          <Ionicons name="refresh-outline" size={20} color={C.accent} />
         </Pressable>
       </View>
 
       {isLoading && (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.accent} />
+          <ActivityIndicator size="large" color={C.accent} />
           <Text style={styles.loadingText}>Loading game details…</Text>
         </View>
       )}
@@ -61,7 +67,7 @@ export default function GameDetailScreen() {
           <Ionicons name="alert-circle-outline" size={44} color={Colors.live} />
           <Text style={styles.errorTitle}>Could not load game details</Text>
           <Text style={styles.errorSub}>{(error as any)?.message ?? 'Please try again.'}</Text>
-          <Pressable style={styles.retryBtn} onPress={refetch}>
+          <Pressable style={[styles.retryBtn, { backgroundColor: C.accent }]} onPress={handleRefetch}>
             <Text style={styles.retryText}>Retry</Text>
           </Pressable>
         </View>
@@ -79,7 +85,33 @@ export default function GameDetailScreen() {
             awayTeam={data.awayTeam}
             status={data.status}
             statusText={data.statusText}
+            sport={sport ?? ''}
           />
+
+          {/* Win probability */}
+          {(() => {
+            const wp = computeWinProbability({
+              homeScore: data.homeTeam.score,
+              awayScore: data.awayTeam.score,
+              homeRecord: data.homeTeam.record,
+              awayRecord: data.awayTeam.record,
+              homeStats: data.homeStats,
+              awayStats: data.awayStats,
+              status: data.status,
+              statusText: data.statusText,
+              sport: sport ?? '',
+            });
+            if (!wp) return null;
+            return (
+              <View style={styles.card}>
+                <WinProbabilityBar
+                  homeTeam={data.homeTeam}
+                  awayTeam={data.awayTeam}
+                  probability={wp}
+                />
+              </View>
+            );
+          })()}
 
           {/* Line scores */}
           {(data.homeTeam.linescores?.length ?? 0) > 0 && (
@@ -95,7 +127,7 @@ export default function GameDetailScreen() {
           {/* Game info */}
           {(data.venue || data.broadcasts.length > 0) && (
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>GAME INFO</Text>
+              <Text style={[styles.sectionTitle, { color: C.accent }]}>GAME INFO</Text>
               {data.venue && (
                 <View style={styles.infoRow}>
                   <Ionicons name="location-outline" size={14} color={Colors.textMuted} />
@@ -114,11 +146,11 @@ export default function GameDetailScreen() {
           {/* Team stats */}
           {(data.homeStats.length > 0 || data.awayStats.length > 0) && (
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>TEAM STATS</Text>
+              <Text style={[styles.sectionTitle, { color: C.accent }]}>TEAM STATS</Text>
               <View style={styles.statsHeader}>
-                <Text style={styles.statsTeamLabel}>{data.awayTeam.abbreviation}</Text>
+                <Text style={[styles.statsTeamLabel, { color: C.accent }]}>{data.awayTeam.abbreviation}</Text>
                 <View style={styles.statsFlex} />
-                <Text style={styles.statsTeamLabel}>{data.homeTeam.abbreviation}</Text>
+                <Text style={[styles.statsTeamLabel, { color: C.accent }]}>{data.homeTeam.abbreviation}</Text>
               </View>
               {data.homeStats.map((stat, i) => {
                 const awayStat = data.awayStats[i];
@@ -136,7 +168,7 @@ export default function GameDetailScreen() {
           {/* Player stats */}
           {data.playerLines.length > 0 && (
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>PLAYER STATS</Text>
+              <Text style={[styles.sectionTitle, { color: C.accent }]}>PLAYER STATS</Text>
               {(() => {
                 // Group lines by category
                 const cats = [...new Set(data.playerLines.map(p => p.category))].filter(Boolean);
@@ -146,7 +178,7 @@ export default function GameDetailScreen() {
                   return (
                     <View key={cat} style={styles.playerGroup}>
                       <View style={styles.playerCatHeader}>
-                        <Text style={styles.playerCatLabel}>{cat?.toUpperCase()}</Text>
+                        <Text style={[styles.playerCatLabel, { color: C.accent }]}>{cat?.toUpperCase()}</Text>
                         <View style={styles.playerStatLabels}>
                           {labels.map(lbl => (
                             <Text key={lbl} style={styles.playerColHeader}>{lbl}</Text>
@@ -183,7 +215,7 @@ export default function GameDetailScreen() {
           {/* Recent plays */}
           {data.recentPlays.length > 0 && (
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>RECENT PLAYS</Text>
+              <Text style={[styles.sectionTitle, { color: C.accent }]}>RECENT PLAYS</Text>
               {data.recentPlays.map((play, i) => (
                 <View key={play.id} style={[styles.playRow, i > 0 && styles.playBorder]}>
                   <View style={styles.playMeta}>

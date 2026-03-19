@@ -5,6 +5,8 @@ import { getGameStatus, getStatusText } from '@/utils/statusHelpers';
 import { formatGameTime } from '@/utils/dateHelpers';
 import type { AppError } from '@/api/errors';
 import type { GameData, GameStatus, Play, PlayerLine, StatLine, TeamInfo } from '@/api/types';
+import { computeWinProbability } from '@/utils/winProbability';
+import type { WinProbability } from '@/utils/winProbability';
 
 const LIVE_INTERVAL = 20_000;
 
@@ -48,6 +50,7 @@ function buildSummaryFromGameData(game: GameData): GameSummaryData {
     awayStats: [],
     recentPlays: [],
     playerLines: [],
+    winProbability: null,
   };
 }
 
@@ -62,6 +65,7 @@ export interface GameSummaryData {
   awayStats: StatLine[];
   recentPlays: Play[];
   playerLines: PlayerLine[];  // top players from both teams, grouped by category
+  winProbability: WinProbability | null;
 }
 
 // Box score stats — key sport-relevant stats only
@@ -168,17 +172,33 @@ export function useGameSummary(
           });
         });
 
+        const homeTeam = buildTeamFromSummary(home);
+        const awayTeam = buildTeamFromSummary(away);
+        const homeStats = extractStats(raw, homeTeam.abbreviation);
+        const awayStats = extractStats(raw, awayTeam.abbreviation);
+
         return {
-          homeTeam: buildTeamFromSummary(home),
-          awayTeam: buildTeamFromSummary(away),
+          homeTeam,
+          awayTeam,
           status: gameStatus,
           statusText,
           venue: competition.venue?.fullName,
           broadcasts,
-          homeStats: extractStats(raw, buildTeamFromSummary(home).abbreviation),
-          awayStats: extractStats(raw, buildTeamFromSummary(away).abbreviation),
+          homeStats,
+          awayStats,
           recentPlays,
           playerLines,
+          winProbability: computeWinProbability({
+            homeScore: homeTeam.score,
+            awayScore: awayTeam.score,
+            homeRecord: homeTeam.record,
+            awayRecord: awayTeam.record,
+            homeStats,
+            awayStats,
+            status: gameStatus,
+            statusText,
+            sport,
+          }),
         };
       } catch (err) {
         const appError = classifyError(err);
