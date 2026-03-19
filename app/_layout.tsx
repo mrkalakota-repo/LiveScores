@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-
 import { LiveGamesProvider } from '@/contexts/LiveGamesContext';
 import { LiveCountPoller } from '@/components/LiveCountPoller';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { SportPreferencesProvider } from '@/contexts/SportPreferencesContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,13 +34,15 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <LiveGamesProvider>
-          <LiveCountPoller />
-          <StatusBar style="light" />
-          <Stack screenOptions={{ headerShown: false }} />
-        </LiveGamesProvider>
-      </QueryClientProvider>
+      <SportPreferencesProvider>
+        <QueryClientProvider client={queryClient}>
+          <LiveGamesProvider>
+            <LiveCountPoller />
+            <StatusBar style="light" />
+            <Stack screenOptions={{ headerShown: false }} />
+          </LiveGamesProvider>
+        </QueryClientProvider>
+      </SportPreferencesProvider>
     </ThemeProvider>
   );
 }
