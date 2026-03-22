@@ -94,11 +94,16 @@ export default function SettingsScreen() {
               accessibilityRole="radio"
               accessibilityState={{ checked: isActive }}
             >
-              {/* Mini colour palette dots */}
-              <View style={styles.themeDots}>
-                <View style={[styles.themeDot, { backgroundColor: meta.preview }]} />
-                <View style={[styles.themeDot, styles.themeDotSmall, { backgroundColor: meta.preview, opacity: 0.45 }]} />
-                <View style={[styles.themeDot, styles.themeDotSmall, { backgroundColor: meta.preview, opacity: 0.2 }]} />
+              {/* Mini card preview */}
+              <View style={[styles.miniCard, { backgroundColor: meta.surface }]}>
+                <View style={[styles.miniAccent, { backgroundColor: meta.live }]} />
+                <View style={styles.miniInner}>
+                  <View style={[styles.miniLine, { backgroundColor: meta.textPrimary, width: 24 }]} />
+                  <View style={[styles.miniLine, { backgroundColor: meta.textMuted, width: 20 }]} />
+                </View>
+                <View style={[styles.miniScore, { backgroundColor: meta.preview }]}>
+                  <View style={[styles.miniScoreDot, { backgroundColor: meta.bg }]} />
+                </View>
               </View>
               <View style={styles.themeMeta}>
                 <Text style={[styles.themeLabel, { color: meta.preview }]}>
@@ -132,7 +137,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   sectionLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1.2,
     color: Colors.textMuted,
@@ -143,7 +148,7 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   sectionHint: {
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.textMuted,
     marginBottom: 12,
     marginLeft: 4,
@@ -178,7 +183,7 @@ const styles = StyleSheet.create({
   sportLabel: {
     flex: 1,
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
     color: Colors.textMuted,
   },
   checkbox: {
@@ -192,7 +197,7 @@ const styles = StyleSheet.create({
   },
   // ── Theme rows ──────────────────────────────────────────────────────
   themeList: {
-    gap: 10,
+    gap: 12,
   },
   themeRow: {
     flexDirection: 'row',
@@ -202,32 +207,48 @@ const styles = StyleSheet.create({
     padding: 18,
     gap: 16,
   },
-  themeDots: {
+  miniCard: {
+    width: 44,
+    height: 40,
+    borderRadius: 8,
     flexDirection: 'row',
-    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  miniAccent: {
+    width: 3,
+  },
+  miniInner: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingLeft: 6,
     gap: 4,
   },
-  themeDot: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+  miniLine: {
+    height: 3,
+    borderRadius: 1.5,
+    opacity: 0.6,
   },
-  themeDotSmall: {
+  miniScore: {
     width: 12,
-    height: 12,
-    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  miniScoreDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
   },
   themeMeta: {
     flex: 1,
     gap: 4,
   },
   themeLabel: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '700',
     letterSpacing: 0.3,
   },
   themeDesc: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '500',
   },
   checkCircle: {

@@ -54,9 +54,9 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
     marginHorizontal: 12,
-    marginVertical: 5,
-    borderRadius: 12,
-    padding: 14,
+    marginVertical: 8,
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
     borderColor: Colors.border,
     gap: 10,
@@ -73,9 +73,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   logo: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: Colors.surfaceElevated,
   },
   name: {

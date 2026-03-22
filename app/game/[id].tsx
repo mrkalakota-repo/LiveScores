@@ -1,6 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,6 +22,7 @@ import { computeWinProbability } from '@/utils/winProbability';
 
 export default function GameDetailScreen() {
   const { C } = useTheme();
+  const [showMiniHeader, setShowMiniHeader] = useState(false);
   const router = useRouter();
   const { id, sport, league } = useLocalSearchParams<{
     id: string;
@@ -39,6 +43,10 @@ export default function GameDetailScreen() {
 
   const handleRefetch = useCallback(() => { refetch(); }, [refetch]);
 
+  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setShowMiniHeader(e.nativeEvent.contentOffset.y > 180);
+  }, []);
+
   return (
     <View style={[styles.screen, { backgroundColor: C.background }]}>
       {/* Custom back header */}
@@ -54,6 +62,21 @@ export default function GameDetailScreen() {
           <Ionicons name="refresh-outline" size={20} color={C.accent} />
         </Pressable>
       </View>
+
+      {/* Sticky mini-header — visible when scrolled past hero */}
+      {showMiniHeader && data && (
+        <View style={[styles.miniHeader, { backgroundColor: C.surface, borderBottomColor: C.border }]}>
+          <Text style={[styles.miniTeam, { color: C.textPrimary }]}>
+            {data.awayTeam.abbreviation}
+          </Text>
+          <Text style={[styles.miniScore, { color: C.textPrimary }]}>
+            {data.status === 'scheduled' ? 'vs' : `${data.awayTeam.score} - ${data.homeTeam.score}`}
+          </Text>
+          <Text style={[styles.miniTeam, { color: C.textPrimary }]}>
+            {data.homeTeam.abbreviation}
+          </Text>
+        </View>
+      )}
 
       {isLoading && (
         <View style={styles.center}>
@@ -78,6 +101,8 @@ export default function GameDetailScreen() {
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
         >
           {/* Score header */}
           <GameDetailHeader
@@ -103,7 +128,7 @@ export default function GameDetailScreen() {
             });
             if (!wp) return null;
             return (
-              <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+              <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border, shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
                 <WinProbabilityBar
                   homeTeam={data.homeTeam}
                   awayTeam={data.awayTeam}
@@ -115,7 +140,7 @@ export default function GameDetailScreen() {
 
           {/* Line scores */}
           {(data.homeTeam.linescores?.length ?? 0) > 0 && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border, shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
               <LineScores
                 sport={sport ?? ''}
                 homeTeam={data.homeTeam}
@@ -126,8 +151,11 @@ export default function GameDetailScreen() {
 
           {/* Game info */}
           {(data.venue || data.broadcasts.length > 0) && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Text style={[styles.sectionTitle, { color: C.accent }]}>GAME INFO</Text>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border, shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: C.accent }]}>GAME INFO</Text>
+                <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
+              </View>
               {data.venue && (
                 <View style={styles.infoRow}>
                   <Ionicons name="location-outline" size={14} color={Colors.textMuted} />
@@ -145,8 +173,11 @@ export default function GameDetailScreen() {
 
           {/* Team stats */}
           {(data.homeStats.length > 0 || data.awayStats.length > 0) && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Text style={[styles.sectionTitle, { color: C.accent }]}>TEAM STATS</Text>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border, shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: C.accent }]}>TEAM STATS</Text>
+                <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
+              </View>
               <View style={styles.statsHeader}>
                 <Text style={[styles.statsTeamLabel, { color: C.accent }]}>{data.awayTeam.abbreviation}</Text>
                 <View style={styles.statsFlex} />
@@ -167,8 +198,11 @@ export default function GameDetailScreen() {
 
           {/* Player stats */}
           {data.playerLines.length > 0 && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Text style={[styles.sectionTitle, { color: C.accent }]}>PLAYER STATS</Text>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border, shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: C.accent }]}>PLAYER STATS</Text>
+                <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
+              </View>
               {(() => {
                 // Group lines by category
                 const cats = [...new Set(data.playerLines.map(p => p.category))].filter(Boolean);
@@ -214,8 +248,11 @@ export default function GameDetailScreen() {
 
           {/* Recent plays */}
           {data.recentPlays.length > 0 && (
-            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border }]}>
-              <Text style={[styles.sectionTitle, { color: C.accent }]}>RECENT PLAYS</Text>
+            <View style={[styles.card, { backgroundColor: C.surface, borderColor: C.border, shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: C.accent }]}>RECENT PLAYS</Text>
+                <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
+              </View>
               {data.recentPlays.map((play, i) => (
                 <View key={play.id} style={[styles.playRow, i > 0 && styles.playBorder]}>
                   <View style={styles.playMeta}>
@@ -267,13 +304,13 @@ const styles = StyleSheet.create({
   backLabel: {
     color: Colors.textPrimary,
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   navTitle: {
     flex: 1,
     textAlign: 'center',
     color: Colors.textPrimary,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.3,
   },
@@ -290,7 +327,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 13,
   },
   errorTitle: {
     color: Colors.textPrimary,
@@ -327,22 +364,50 @@ const styles = StyleSheet.create({
     padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 5,
+  },
+  miniHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    gap: 12,
+  },
+  miniTeam: {
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  miniScore: {
+    fontSize: 15,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1.5,
     color: Colors.accent,
-    marginBottom: 12,
+  },
+  sectionLine: {
+    flex: 1,
+    height: 1,
+    opacity: 0.2,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   infoText: {
     fontSize: 13,
@@ -369,20 +434,20 @@ const styles = StyleSheet.create({
   },
   statValue: {
     width: 52,
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: Colors.textPrimary,
     textAlign: 'left',
   },
   statLabel: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.textMuted,
     textAlign: 'center',
   },
   playRow: {
-    gap: 6,
-    paddingVertical: 10,
+    gap: 8,
+    paddingVertical: 12,
   },
   playBorder: {
     borderTopWidth: 1,
@@ -394,9 +459,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   playClock: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.textMuted,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   playTeamBadge: {
     paddingHorizontal: 7,
@@ -458,7 +523,7 @@ const styles = StyleSheet.create({
   playerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 7,
+    paddingVertical: 8,
   },
   playerBorder: {
     borderTopWidth: 1,
@@ -486,22 +551,22 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   playerTeamText: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '700',
     color: Colors.textSecondary,
     letterSpacing: 0.3,
   },
   playerJersey: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.textMuted,
-    fontWeight: '500',
+    fontWeight: '700',
     width: 28,
   },
   playerName: {
     flex: 1,
     fontSize: 13,
     color: Colors.textPrimary,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   playerStatValues: {
     flexDirection: 'row',

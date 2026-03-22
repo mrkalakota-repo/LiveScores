@@ -48,6 +48,7 @@ export type ColorScheme = {
   // Misc
   divider: string;
   accent: string;
+  isDark: boolean;
 };
 
 // ── Carbon — pure-dark with cyan ──────────────────────────────────────────────
@@ -89,6 +90,7 @@ const carbon: ColorScheme = {
   chipInactiveText:    '#aab8d0',
   divider:             '#141414',
   accent:              '#00c8ff',
+  isDark:              true,
 };
 
 // ── Midnight — deep navy-purple with violet ───────────────────────────────────
@@ -130,6 +132,7 @@ const midnight: ColorScheme = {
   chipInactiveText:    '#a888d8',
   divider:             '#1a0038',
   accent:              '#bf5af2',
+  isDark:              true,
 };
 
 // ── Ember — warm dark with amber ──────────────────────────────────────────────
@@ -171,12 +174,16 @@ const ember: ColorScheme = {
   chipInactiveText:    '#c8a06a',
   divider:             '#281800',
   accent:              '#ff9f0a',
+  isDark:              true,
 };
 
 export const THEMES: Record<ThemeName, ColorScheme> = { carbon, midnight, ember };
 
-export const THEME_META: Record<ThemeName, { label: string; description: string; preview: string; bg: string }> = {
-  carbon:   { label: 'Carbon',   description: 'Pure black with cyan',       preview: '#00c8ff', bg: '#000000' },
-  midnight: { label: 'Midnight', description: 'Deep purple, violet accent', preview: '#bf5af2', bg: '#07001a' },
-  ember:    { label: 'Ember',    description: 'Warm dark with amber',       preview: '#ff9f0a', bg: '#0f0800' },
+export const THEME_META: Record<ThemeName, {
+  label: string; description: string; preview: string; bg: string;
+  surface: string; textPrimary: string; textMuted: string; live: string;
+}> = {
+  carbon:   { label: 'Carbon',   description: 'Pure black with cyan',       preview: '#00c8ff', bg: '#000000', surface: '#0d0d0d', textPrimary: '#ffffff', textMuted: '#627a98', live: '#ff2d55' },
+  midnight: { label: 'Midnight', description: 'Deep purple, violet accent', preview: '#bf5af2', bg: '#07001a', surface: '#0e0025', textPrimary: '#ede0ff', textMuted: '#6b4a99', live: '#ff2d55' },
+  ember:    { label: 'Ember',    description: 'Warm dark with amber',       preview: '#ff9f0a', bg: '#0f0800', surface: '#1a0f00', textPrimary: '#fff5e0', textMuted: '#7a5830', live: '#ff2d55' },
 };

@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   record: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.textMuted,
     marginRight: 8,
   },

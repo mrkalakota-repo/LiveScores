@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 28,
+    paddingVertical: 36,
     backgroundColor: Colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
@@ -99,17 +99,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoInitial: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 26,
+    fontWeight: '900',
     color: Colors.textMuted,
   },
   abbrev: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 0.5,
   },
   record: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.textMuted,
   },
   score: {
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   vs: {
     fontSize: 13,
     color: Colors.textMuted,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   setsLabel: {
     fontSize: 10,

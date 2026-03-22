@@ -115,12 +115,12 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   centerLabel: {
-    fontSize: 9,
-    fontWeight: '800',
+    fontSize: 10,
+    fontWeight: '700',
     letterSpacing: 1.2,
     color: Colors.textMuted,
     textAlign: 'center',
-    paddingBottom: 4,
+    paddingBottom: 8,
     paddingHorizontal: 6,
   },
   track: {

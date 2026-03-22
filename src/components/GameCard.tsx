@@ -1,6 +1,7 @@
-import React, { memo, useCallback } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { memo, useCallback, useRef } from 'react';
+import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/contexts/ThemeContext';
 import { TeamRow } from './TeamRow';
@@ -14,10 +15,22 @@ interface Props {
 export const GameCard = memo(function GameCard({ game }: Props) {
   const { C } = useTheme();
   const router = useRouter();
-  const accentColor = { live: C.live, halftime: C.halftime, scheduled: C.accent, final: C.border }[game.status] ?? C.border;
+  const accentColor = { live: C.live, halftime: C.halftime, scheduled: C.scheduled, final: C.final }[game.status] ?? C.border;
   const isLive = game.status === 'live' || game.status === 'halftime';
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = useCallback(() => {
+    Animated.timing(scaleAnim, { toValue: 0.975, duration: 100, useNativeDriver: true }).start();
+  }, [scaleAnim]);
+
+  const handlePressOut = useCallback(() => {
+    Animated.timing(scaleAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+  }, [scaleAnim]);
 
   const handlePress = useCallback(() => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     router.push({
       pathname: '/game/[id]',
       params: { id: game.id, sport: game.sport, league: game.league },
@@ -25,14 +38,25 @@ export const GameCard = memo(function GameCard({ game }: Props) {
   }, [router, game.id, game.sport, game.league]);
 
   return (
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
     <Pressable
-      style={({ pressed }) => [
+      style={[
         styles.card,
-        { backgroundColor: C.surface, borderColor: C.border },
-        isLive && styles.cardLive,
-        pressed && styles.cardPressed,
+        {
+          backgroundColor: C.surface,
+          borderColor: C.border,
+          shadowOpacity: C.isDark ? 0.5 : 0.12,
+        },
+        isLive && [styles.cardLive, {
+          backgroundColor: C.liveCardBackground,
+          borderColor: C.liveBorder,
+          shadowColor: C.live,
+          shadowOpacity: C.isDark ? 0.35 : 0.15,
+        }],
       ]}
       onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       accessibilityLabel={`${game.awayTeam.abbreviation} vs ${game.homeTeam.abbreviation}, tap for details`}
       accessibilityRole="button"
     >
@@ -62,15 +86,23 @@ export const GameCard = memo(function GameCard({ game }: Props) {
           </Text>
         )}
 
-        {/* Win probability bar */}
-        {game.winProbability && (
+        {/* Win probability bar — hide when 50/50 (no signal) */}
+        {game.winProbability && game.winProbability.basis !== 'even' && (
           <View style={styles.probRow}>
-            <Text style={[
-              styles.probPct,
-              game.winProbability.away > game.winProbability.home && { color: C.accent },
-            ]}>
-              {game.winProbability.away}%
-            </Text>
+            <View style={styles.probLabel}>
+              <Text style={[
+                styles.probAbbrev,
+                game.winProbability.away > game.winProbability.home && { color: C.accent },
+              ]}>
+                {game.awayTeam.abbreviation}
+              </Text>
+              <Text style={[
+                styles.probPct,
+                game.winProbability.away > game.winProbability.home && { color: C.accent },
+              ]}>
+                {game.winProbability.away}%
+              </Text>
+            </View>
             <View style={styles.probTrack}>
               <View style={[
                 styles.probFill,
@@ -84,17 +116,25 @@ export const GameCard = memo(function GameCard({ game }: Props) {
                 game.winProbability.home > game.winProbability.away && { backgroundColor: C.accent },
               ]} />
             </View>
-            <Text style={[
-              styles.probPct,
-              styles.probPctRight,
-              game.winProbability.home > game.winProbability.away && { color: C.accent },
-            ]}>
-              {game.winProbability.home}%
-            </Text>
+            <View style={[styles.probLabel, styles.probLabelRight]}>
+              <Text style={[
+                styles.probPct,
+                game.winProbability.home > game.winProbability.away && { color: C.accent },
+              ]}>
+                {game.winProbability.home}%
+              </Text>
+              <Text style={[
+                styles.probAbbrev,
+                game.winProbability.home > game.winProbability.away && { color: C.accent },
+              ]}>
+                {game.homeTeam.abbreviation}
+              </Text>
+            </View>
           </View>
         )}
       </View>
     </Pressable>
+    </Animated.View>
   );
 });
 
@@ -103,7 +143,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: Colors.surface,
     marginHorizontal: 12,
-    marginVertical: 5,
+    marginVertical: 8,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: Colors.border,
@@ -115,15 +155,11 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   cardLive: {
-    backgroundColor: Colors.liveCardBackground,
-    borderColor: Colors.liveBorder,
-    shadowColor: Colors.live,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.35,
     shadowRadius: 18,
     elevation: 10,
   },
-  cardPressed: { opacity: 0.78 },
+  // press feedback is handled by Animated scale
   accent: {
     width: 6,
     borderTopLeftRadius: 16,
@@ -131,8 +167,8 @@ const styles = StyleSheet.create({
   },
   inner: {
     flex: 1,
-    paddingHorizontal: 14,
-    paddingTop: 10,
+    paddingHorizontal: 16,
+    paddingTop: 12,
     paddingBottom: 12,
   },
   header: {
@@ -142,7 +178,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   broadcast: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.textMuted,
     flexShrink: 1,
     marginLeft: 8,
@@ -156,19 +192,19 @@ const styles = StyleSheet.create({
   situation: {
     fontSize: 11,
     color: Colors.textSecondary,
-    marginTop: 7,
+    marginTop: 8,
     fontStyle: 'italic',
     lineHeight: 16,
   },
   probRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 9,
-    gap: 6,
+    marginTop: 8,
+    gap: 8,
   },
   probTrack: {
     flex: 1,
-    height: 4,
+    height: 6,
     flexDirection: 'row',
     borderRadius: 2,
     overflow: 'hidden',
@@ -183,13 +219,23 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.background,
   },
+  probLabel: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+    minWidth: 52,
+  },
+  probLabelRight: {
+    justifyContent: 'flex-end',
+  },
+  probAbbrev: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.textMuted,
+  },
   probPct: {
     fontSize: 10,
     fontWeight: '700',
     color: Colors.textMuted,
-    minWidth: 28,
-  },
-  probPctRight: {
-    textAlign: 'right',
   },
 });
