@@ -13,12 +13,12 @@
       "backgroundColor": "#1668d4"
     },
     "ios": {
-      "bundleIdentifier": "com.mrkalakota.livescores",
+      "bundleIdentifier": "com.sports.livescores",
       "buildNumber": "1",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.mrkalakota.livescores",
+      "package": "com.sports.livescores",
       "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#1668d4",
@@ -34,6 +34,12 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "231958d6-ef09-4ed0-865b-1f92c6f3c640"
+      }
+    }
   }
 }
