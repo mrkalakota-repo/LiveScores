@@ -68,7 +68,7 @@ describe('useScoreboard', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([fakeGame]);
     expect(mockFetch).toHaveBeenCalledWith('football', 'nfl');
-    expect(mockTransform).toHaveBeenCalledWith({ events: [] }, 'football', 'nfl');
+    expect(mockTransform).toHaveBeenCalledWith({ events: [] }, 'football', 'nfl', undefined);
   });
 
   it('is initially in loading state', () => {

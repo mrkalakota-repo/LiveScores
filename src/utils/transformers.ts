@@ -69,12 +69,16 @@ function buildTeam(competitor: EspnCompetitor): TeamInfo {
   };
 }
 
-/** Flatten all competitions for an event — handles both direct and groupings layouts. */
-function getCompetitions(event: EspnEvent): EspnCompetition[] {
+/** Flatten all competitions for an event — handles both direct and groupings layouts.
+ *  When `groupingSlug` is provided, only competitions from that grouping are returned. */
+function getCompetitions(event: EspnEvent, groupingSlug?: string): EspnCompetition[] {
   if (event.competitions && event.competitions.length > 0) return event.competitions;
   // Tennis / individual sports nest competitions inside groupings
   if (event.groupings && event.groupings.length > 0) {
-    return event.groupings.flatMap(g => g.competitions ?? []);
+    const groups = groupingSlug
+      ? event.groupings.filter(g => g.grouping.slug === groupingSlug)
+      : event.groupings;
+    return groups.flatMap(g => g.competitions ?? []);
   }
   return [];
 }
@@ -83,11 +87,12 @@ export function transformScoreboard(
   raw: EspnScoreboardResponse,
   sport: string,
   league: string,
+  groupingSlug?: string,
 ): GameData[] {
   const events = raw.events ?? [];
 
   return events.flatMap(event => {
-    const competitions = getCompetitions(event);
+    const competitions = getCompetitions(event, groupingSlug);
     return competitions.flatMap((competition): GameData[] => {
       const status = competition.status ?? event.status;
       if (!status) return [];

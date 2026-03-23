@@ -6,13 +6,13 @@ import { POLL_INTERVAL_MS } from '@/constants/config';
 import type { AppError } from '@/api/errors';
 import type { GameData } from '@/api/types';
 
-export function useScoreboard(sport: string, league: string) {
+export function useScoreboard(sport: string, league: string, groupingSlug?: string) {
   return useQuery<GameData[], AppError>({
-    queryKey: ['scoreboard', sport, league],
+    queryKey: ['scoreboard', sport, league, ...(groupingSlug ? [groupingSlug] : [])],
     enabled: sport !== '' && league !== '',
     queryFn: async () => {
       const raw = await fetchScoreboard(sport, league);
-      return transformScoreboard(raw, sport, league);
+      return transformScoreboard(raw, sport, league, groupingSlug);
     },
     refetchInterval: POLL_INTERVAL_MS,
     refetchIntervalInBackground: false,

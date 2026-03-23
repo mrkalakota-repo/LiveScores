@@ -30,9 +30,12 @@ export const SPORTS: SportConfig[] = [
   { id: 'cricket', label: 'Cricket',    sport: 'cricket',    league: 'icc.cricket', icon: 'cricket',                iconOutline: 'cricket',                   tabColor: '#00B4D8', iconFamily: 'MaterialCommunityIcons' },
 ];
 
-export const TENNIS_LEAGUES: LeagueConfig[] = [
-  { id: 'atp', label: 'Men',   sport: 'tennis', league: 'atp' },
-  { id: 'wta', label: 'Women', sport: 'tennis', league: 'wta' },
+/** Tennis format tabs — `league` field holds the grouping slug for filtering. */
+export const TENNIS_FORMATS: LeagueConfig[] = [
+  { id: 'mens-singles',    label: "Men's Singles",    sport: 'tennis', league: 'mens-singles' },
+  { id: 'womens-singles',  label: "Women's Singles",  sport: 'tennis', league: 'womens-singles' },
+  { id: 'mens-doubles',    label: "Men's Doubles",    sport: 'tennis', league: 'mens-doubles' },
+  { id: 'womens-doubles',  label: "Women's Doubles",  sport: 'tennis', league: 'womens-doubles' },
 ];
 
 export const BASKETBALL_LEAGUES: LeagueConfig[] = [

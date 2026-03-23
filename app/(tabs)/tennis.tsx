@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
-import { TENNIS_LEAGUES } from '@/constants/sports';
+import { TENNIS_FORMATS } from '@/constants/sports';
 import type { LeagueConfig } from '@/constants/sports';
-import { useScoreboard } from '@/hooks/useScoreboard';
+import { useTennisScoreboard } from '@/hooks/useTennisScoreboard';
 import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
 import { ScoreboardList } from '@/components/ScoreboardList';
 import { LeagueChipBar } from '@/components/LeagueChipBar';
@@ -11,9 +11,9 @@ import { useLiveGames } from '@/contexts/LiveGamesContext';
 
 export default function TennisScreen() {
   const { C } = useTheme();
-  const [selectedLeague, setSelectedLeague] = useState<LeagueConfig>(TENNIS_LEAGUES[0]);
+  const [selectedFormat, setSelectedFormat] = useState<LeagueConfig>(TENNIS_FORMATS[0]);
   const { data, isLoading, isError, error, isRefetching, refetch, dataUpdatedAt } =
-    useScoreboard(selectedLeague.sport, selectedLeague.league);
+    useTennisScoreboard(selectedFormat.league);
   const { setLiveCount } = useLiveGames();
   useRefreshOnFocus(refetch);
 
@@ -25,9 +25,9 @@ export default function TennisScreen() {
   return (
     <View style={[styles.container, { backgroundColor: C.background }]}>
       <LeagueChipBar
-        leagues={TENNIS_LEAGUES}
-        selected={selectedLeague.league}
-        onSelect={setSelectedLeague}
+        leagues={TENNIS_FORMATS}
+        selected={selectedFormat.league}
+        onSelect={setSelectedFormat}
       />
       <ScoreboardList
         games={data ?? []}
@@ -38,7 +38,7 @@ export default function TennisScreen() {
         onRetry={refetch}
         onRefresh={refetch}
         updatedAt={dataUpdatedAt}
-        sport={selectedLeague.label}
+        sport="Tennis"
       />
     </View>
   );
