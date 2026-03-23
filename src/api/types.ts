@@ -54,6 +54,17 @@ export interface EspnCompetitor {
     fullName?: string;
     flag?: { href: string; alt?: string };
   };
+  // Doubles tennis: roster replaces athlete
+  roster?: {
+    displayName?: string;
+    shortDisplayName?: string;
+    athletes?: Array<{
+      displayName?: string;
+      shortName?: string;
+      fullName?: string;
+      flag?: { href: string; alt?: string };
+    }>;
+  };
   score?: string;
   winner?: boolean | string; // cricket returns "true"/"false" strings
   linescores?: Array<{ value: number }>;

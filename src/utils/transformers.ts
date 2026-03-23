@@ -6,6 +6,8 @@ import { computeWinProbability } from './winProbability';
 function getTeamLogo(competitor: EspnCompetitor): string {
   // Individual sport: use country flag from athlete
   if (competitor.athlete?.flag?.href) return competitor.athlete.flag.href;
+  // Doubles: use first athlete's flag
+  if (competitor.roster?.athletes?.[0]?.flag?.href) return competitor.roster.athletes[0].flag.href;
   const team = competitor.team ?? {};
   if (team.logo) return team.logo;
   if (team.logos && team.logos.length > 0) return team.logos[0].href;
@@ -36,14 +38,29 @@ function buildTennisScore(competitor: EspnCompetitor): string {
 }
 
 function buildTeam(competitor: EspnCompetitor): TeamInfo {
-  // Individual sport (tennis): build from athlete field
+  // Individual sport (tennis singles): build from athlete field
   if (competitor.athlete) {
     const a = competitor.athlete;
     const displayName = a.fullName ?? a.displayName ?? '?';
-    // shortName is ESPN's compact form e.g. "T. Schoolkate" — ideal for card display
     const abbreviation = a.shortName ?? displayName;
     return {
       id: a.id ?? competitor.id,
+      abbreviation,
+      displayName,
+      logo: getTeamLogo(competitor),
+      score: buildTennisScore(competitor),
+      winner: competitor.winner === true || competitor.winner === 'true',
+      record: getRecord(competitor),
+      linescores: getLinescores(competitor),
+    };
+  }
+  // Doubles tennis: build from roster field
+  if (competitor.roster) {
+    const r = competitor.roster;
+    const displayName = r.displayName ?? r.athletes?.map(a => a.displayName).join(' / ') ?? '?';
+    const abbreviation = r.shortDisplayName ?? r.athletes?.map(a => a.shortName).join(' / ') ?? displayName;
+    return {
+      id: competitor.id,
       abbreviation,
       displayName,
       logo: getTeamLogo(competitor),
