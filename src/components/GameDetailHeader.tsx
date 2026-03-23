@@ -75,11 +75,106 @@ function createStyles(C: ColorScheme) {
       fontSize: 13,
       fontWeight: '700',
     },
-    setsLabel: {
+    // ── Tennis set-by-set layout ────────────────────────────────────────
+    tennisContainer: {
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      paddingHorizontal: 20,
+      paddingVertical: 28,
+      gap: 16,
+    },
+    tennisStatusRow: {
+      alignItems: 'center',
+      paddingBottom: 4,
+    },
+    tennisPlayerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 6,
+    },
+    tennisLogo: {
+      width: 32,
+      height: 32,
+    },
+    tennisLogoPlaceholder: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: C.surfaceElevated,
+    },
+    tennisLogoInitial: {
+      fontSize: 14,
+      fontWeight: '900',
+      color: C.textMuted,
+    },
+    tennisName: {
+      flex: 1,
+      fontSize: 14,
+      fontWeight: '800',
+      letterSpacing: 0.2,
+    },
+    tennisSetsRow: {
+      flexDirection: 'row',
+      gap: 4,
+    },
+    tennisSetCell: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    tennisSetText: {
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    tennisSetWon: {
+      fontWeight: '900',
+    },
+    tennisSetsWon: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 4,
+    },
+    tennisSetsWonText: {
+      fontSize: 18,
+      fontWeight: '900',
+    },
+    tennisHeaderRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 4,
+      marginBottom: 2,
+    },
+    tennisHeaderSpacer: {
+      flex: 1,
+    },
+    tennisHeaderLabel: {
+      width: 32,
+      textAlign: 'center',
       fontSize: 10,
       fontWeight: '700',
-      letterSpacing: 1,
-      marginTop: 2,
+      letterSpacing: 0.3,
+    },
+    tennisHeaderTotal: {
+      width: 36,
+      textAlign: 'center',
+      fontSize: 10,
+      fontWeight: '700',
+      letterSpacing: 0.3,
+      marginLeft: 4,
+    },
+    tennisDivider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: C.border,
+      marginVertical: 2,
     },
     // ── Cricket stacked rows ──────────────────────────────────────────
     cricketStatusRow: {
@@ -133,10 +228,9 @@ interface TeamColProps {
   team: TeamInfo;
   gameStatus: GameStatus;
   align: 'left' | 'right';
-  isTennis?: boolean;
 }
 
-const TeamCol = memo(function TeamCol({ team, gameStatus, align, isTennis }: TeamColProps) {
+const TeamCol = memo(function TeamCol({ team, gameStatus, align }: TeamColProps) {
   const { C } = useTheme();
   const styles = useMemo(() => createStyles(C), [C]);
   const isFinal = gameStatus === 'final';
@@ -161,8 +255,67 @@ const TeamCol = memo(function TeamCol({ team, gameStatus, align, isTennis }: Tea
       <Text style={[styles.score, { color: scoreColor }]}>
         {isScheduled ? '--' : team.score}
       </Text>
-      {isTennis && !isScheduled && (
-        <Text style={[styles.setsLabel, { color: C.textMuted }]}>SETS</Text>
+    </View>
+  );
+});
+
+interface TennisPlayerRowProps {
+  team: TeamInfo;
+  opponentLinescores: number[];
+  gameStatus: GameStatus;
+}
+
+const TennisPlayerRow = memo(function TennisPlayerRow({ team, opponentLinescores, gameStatus }: TennisPlayerRowProps) {
+  const { C } = useTheme();
+  const styles = useMemo(() => createStyles(C), [C]);
+  const isFinal = gameStatus === 'final';
+  const isScheduled = gameStatus === 'scheduled';
+  const nameColor = isFinal ? (team.winner ? C.winner : C.loser) : C.textPrimary;
+  const ls = team.linescores ?? [];
+  const setsWon = ls.filter((g, i) => g > (opponentLinescores[i] ?? 0)).length;
+
+  return (
+    <View style={styles.tennisPlayerRow}>
+      {team.logo ? (
+        <Image source={{ uri: team.logo }} style={styles.tennisLogo} contentFit="contain" recyclingKey={team.id} />
+      ) : (
+        <View style={styles.tennisLogoPlaceholder}>
+          <Text style={styles.tennisLogoInitial}>{team.abbreviation.charAt(0)}</Text>
+        </View>
+      )}
+      <Text style={[styles.tennisName, { color: nameColor }]} numberOfLines={1}>
+        {team.abbreviation}
+      </Text>
+      <View style={styles.tennisSetsRow}>
+        {ls.map((games, i) => {
+          const oppGames = opponentLinescores[i] ?? 0;
+          const wonSet = games > oppGames;
+          return (
+            <View
+              key={i}
+              style={[
+                styles.tennisSetCell,
+                { backgroundColor: C.surfaceElevated },
+                wonSet && { backgroundColor: C.accent + '22' },
+              ]}
+            >
+              <Text style={[
+                styles.tennisSetText,
+                { color: C.textSecondary },
+                wonSet && [styles.tennisSetWon, { color: C.accent }],
+              ]}>
+                {games}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
+      {!isScheduled && (
+        <View style={[styles.tennisSetsWon, { backgroundColor: team.winner ? C.accent + '22' : C.surfaceElevated }]}>
+          <Text style={[styles.tennisSetsWonText, { color: team.winner ? C.accent : C.textSecondary }]}>
+            {setsWon}
+          </Text>
+        </View>
       )}
     </View>
   );
@@ -230,9 +383,41 @@ export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayT
     );
   }
 
+  if (isTennis) {
+    const awayLS = awayTeam.linescores ?? [];
+    const homeLS = homeTeam.linescores ?? [];
+    const setCount = Math.max(awayLS.length, homeLS.length);
+    const setLabels = Array.from({ length: setCount }, (_, i) => `S${i + 1}`);
+
+    return (
+      <View style={[styles.container, styles.tennisContainer]}>
+        <View style={styles.tennisStatusRow}>
+          <StatusBadge status={status} statusText={statusText} />
+        </View>
+
+        {/* Column headers: spacer + S1 S2 S3 ... + SETS */}
+        {setCount > 0 && status !== 'scheduled' && (
+          <View style={styles.tennisHeaderRow}>
+            {/* Logo + name spacer */}
+            <View style={{ width: 32 }} />
+            <View style={styles.tennisHeaderSpacer} />
+            {setLabels.map(lbl => (
+              <Text key={lbl} style={[styles.tennisHeaderLabel, { color: C.textMuted }]}>{lbl}</Text>
+            ))}
+            <Text style={[styles.tennisHeaderTotal, { color: C.textMuted }]}>SETS</Text>
+          </View>
+        )}
+
+        <TennisPlayerRow team={awayTeam} opponentLinescores={homeLS} gameStatus={status} />
+        <View style={styles.tennisDivider} />
+        <TennisPlayerRow team={homeTeam} opponentLinescores={awayLS} gameStatus={status} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <TeamCol team={awayTeam} gameStatus={status} align="left" isTennis={isTennis} />
+      <TeamCol team={awayTeam} gameStatus={status} align="left" />
 
       <View style={styles.middle}>
         <StatusBadge status={status} statusText={statusText} />
@@ -241,7 +426,7 @@ export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayT
         )}
       </View>
 
-      <TeamCol team={homeTeam} gameStatus={status} align="right" isTennis={isTennis} />
+      <TeamCol team={homeTeam} gameStatus={status} align="right" />
     </View>
   );
 });

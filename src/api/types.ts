@@ -215,6 +215,31 @@ export interface Play {
   isScore: boolean;
 }
 
+// ── Full box score types ────────────────────────────────────────────────────
+
+/** A single player row in a box score category */
+export interface BoxScorePlayer {
+  id: string;
+  name: string;
+  jersey?: string;
+  position?: string;
+  stats: string[];          // raw stat values aligned with header labels
+}
+
+/** One stat category for one team (e.g. "Passing" for KC) */
+export interface BoxScoreCategory {
+  category: string;         // display label e.g. "Passing"
+  labels: string[];         // column headers e.g. ["C/ATT", "YDS", "TD", "INT"]
+  players: BoxScorePlayer[];
+}
+
+/** Full box score for a single team */
+export interface TeamBoxScore {
+  teamAbbrev: string;
+  teamName: string;
+  categories: BoxScoreCategory[];
+}
+
 // ── Cricket-specific types ──────────────────────────────────────────────────
 
 export interface CricketBatsman {

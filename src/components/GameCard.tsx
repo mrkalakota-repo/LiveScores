@@ -196,9 +196,21 @@ export const GameCard = memo(function GameCard({ game }: Props) {
         </View>
 
         {/* Teams */}
-        <TeamRow team={game.awayTeam} isWinner={game.awayTeam.winner} gameStatus={game.status} />
+        <TeamRow
+          team={game.awayTeam}
+          isWinner={game.awayTeam.winner}
+          gameStatus={game.status}
+          isTennis={game.sport === 'tennis'}
+          opponentLinescores={game.homeTeam.linescores}
+        />
         <View style={styles.divider} />
-        <TeamRow team={game.homeTeam} isWinner={game.homeTeam.winner} gameStatus={game.status} />
+        <TeamRow
+          team={game.homeTeam}
+          isWinner={game.homeTeam.winner}
+          gameStatus={game.status}
+          isTennis={game.sport === 'tennis'}
+          opponentLinescores={game.awayTeam.linescores}
+        />
 
         {/* Tennis game-level point score */}
         {game.sport === 'tennis' && game.status === 'live' && (() => {

@@ -20,6 +20,7 @@ import { LineScores } from '@/components/LineScores';
 import { WinProbabilityBar } from '@/components/WinProbabilityBar';
 import { TennisPointBoard } from '@/components/TennisPointBoard';
 import { CricketScorecard } from '@/components/CricketScorecard';
+import { PlayerBoxScore } from '@/components/PlayerBoxScore';
 import { computeWinProbability } from '@/utils/winProbability';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 
@@ -494,6 +495,17 @@ export default function GameDetailScreen() {
                   );
                 });
               })()}
+            </View>
+          )}
+
+          {/* Full box score */}
+          {data.boxScores.length > 0 && (
+            <View style={styles.card}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: C.accent }]}>BOX SCORE</Text>
+                <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
+              </View>
+              <PlayerBoxScore boxScores={data.boxScores} />
             </View>
           )}
 

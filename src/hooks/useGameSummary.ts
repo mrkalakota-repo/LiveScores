@@ -4,7 +4,7 @@ import { classifyError } from '@/api/errors';
 import { getGameStatus, getStatusText } from '@/utils/statusHelpers';
 import { formatGameTime } from '@/utils/dateHelpers';
 import type { AppError } from '@/api/errors';
-import type { GameData, GameStatus, Play, PlayerLine, StatLine, TeamInfo, CricketInningsData, CricketBatsman, CricketBowler } from '@/api/types';
+import type { GameData, GameStatus, Play, PlayerLine, StatLine, TeamInfo, CricketInningsData, CricketBatsman, CricketBowler, TeamBoxScore, BoxScoreCategory, BoxScorePlayer } from '@/api/types';
 import { computeWinProbability } from '@/utils/winProbability';
 import type { WinProbability } from '@/utils/winProbability';
 
@@ -50,6 +50,7 @@ function buildSummaryFromGameData(game: GameData): GameSummaryData {
     awayStats: [],
     recentPlays: [],
     playerLines: [],
+    boxScores: [],
     winProbability: null,
   };
 }
@@ -65,6 +66,7 @@ export interface GameSummaryData {
   awayStats: StatLine[];
   recentPlays: Play[];
   playerLines: PlayerLine[];
+  boxScores: TeamBoxScore[];
   winProbability: WinProbability | null;
   cricketInnings?: CricketInningsData[];
 }
@@ -77,8 +79,12 @@ const STAT_KEYS = ['passingYards', 'rushingYards', 'receivingYards', 'totalYards
 const CATEGORY_LABELS: Record<string, string> = {
   passing: 'Passing', rushing: 'Rushing', receiving: 'Receiving',
   defensive: 'Defense', kicking: 'Kicking', punting: 'Punting',
+  returning: 'Returns', fumbles: 'Fumbles', interceptions: 'Interceptions',
   goalkeeping: 'GK', batting: 'Batting', bowling: 'Bowling',
   scoring: 'Scoring', rebounds: 'Rebounds', assists: 'Assists',
+  starters: 'Starters', bench: 'Bench', pitching: 'Pitching',
+  hitting: 'Hitting', fielding: 'Fielding',
+  skating: 'Skating', goaltending: 'Goaltending',
 };
 
 const MAX_STAT_COLS = 4;
@@ -173,10 +179,50 @@ export function useGameSummary(
           });
         });
 
+        // ── Full box scores per team ──────────────────────────────────
+        const boxScores: TeamBoxScore[] = (raw.boxscore?.players ?? []).map(teamPlayers => {
+          const abbrev = teamPlayers.team.abbreviation;
+          const categories: BoxScoreCategory[] = (teamPlayers.statistics ?? [])
+            .filter(catGroup => catGroup.name && (catGroup.athletes?.length ?? 0) > 0)
+            .map(catGroup => {
+              const categoryLabel = CATEGORY_LABELS[catGroup.name] ?? catGroup.name;
+              const labels = catGroup.labels ?? [];
+              const players: BoxScorePlayer[] = (catGroup.athletes ?? [])
+                .filter(a => {
+                  // Skip players with all zero/empty stats
+                  return a.stats.some(s => s !== '0' && s !== '-' && s !== '' && s !== '0.0');
+                })
+                .map(a => ({
+                  id: a.athlete.id,
+                  name: a.athlete.displayName,
+                  jersey: a.athlete.jersey,
+                  stats: labels.map((_, i) => a.stats[i] ?? '-'),
+                }));
+              return {
+                category: categoryLabel,
+                labels,
+                players,
+              };
+            })
+            .filter(cat => cat.players.length > 0);
+
+          return {
+            teamAbbrev: abbrev,
+            teamName: abbrev,
+            categories,
+          };
+        });
+
         const homeTeam = buildTeamFromSummary(home);
         const awayTeam = buildTeamFromSummary(away);
         const homeStats = extractStats(raw, homeTeam.abbreviation);
         const awayStats = extractStats(raw, awayTeam.abbreviation);
+
+        // Fill in display names for box scores
+        for (const bs of boxScores) {
+          if (bs.teamAbbrev === homeTeam.abbreviation) bs.teamName = homeTeam.displayName;
+          else if (bs.teamAbbrev === awayTeam.abbreviation) bs.teamName = awayTeam.displayName;
+        }
 
         // ── Cricket innings extraction ──────────────────────────────
         let cricketInnings: CricketInningsData[] | undefined;
@@ -290,6 +336,7 @@ export function useGameSummary(
           awayStats,
           recentPlays,
           playerLines,
+          boxScores,
           winProbability: computeWinProbability({
             homeScore: homeTeam.score,
             awayScore: awayTeam.score,

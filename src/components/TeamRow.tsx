@@ -8,15 +8,15 @@ interface Props {
   team: TeamInfo;
   isWinner: boolean;
   gameStatus: GameStatus;
+  /** Opponent linescores — used to determine set winners in tennis */
+  opponentLinescores?: number[];
+  isTennis?: boolean;
 }
 
-export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Props) {
+export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus, opponentLinescores, isTennis }: Props) {
   const { C } = useTheme();
   const isFinal = gameStatus === 'final';
   const isScheduled = gameStatus === 'scheduled';
-
-  // Tennis set scores come through as "6 3 7" — space-separated games per set
-  const isSetScore = !isScheduled && team.score.includes(' ');
 
   const nameColor = isFinal
     ? isWinner ? C.winner : C.loser
@@ -26,6 +26,8 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Pro
     ? isWinner ? C.winnerScore : C.loserScore
     : isScheduled ? C.textMuted
     : C.textPrimary;
+
+  const showTennisSets = isTennis && !isScheduled && team.linescores && team.linescores.length > 0;
 
   return (
     <View style={styles.row}>
@@ -50,9 +52,37 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus }: Pro
           {team.record}
         </Text>
       )}
-      <Text style={[styles.score, isSetScore && styles.scoreSet, { color: scoreColor }]}>
-        {isScheduled ? '--' : team.score}
-      </Text>
+
+      {showTennisSets ? (
+        <View style={styles.setsRow}>
+          {team.linescores!.map((games, i) => {
+            const oppGames = opponentLinescores?.[i] ?? 0;
+            const wonSet = games > oppGames;
+            return (
+              <View
+                key={i}
+                style={[
+                  styles.setCell,
+                  { backgroundColor: C.surfaceElevated },
+                  wonSet && { backgroundColor: C.accent + '22' },
+                ]}
+              >
+                <Text style={[
+                  styles.setCellText,
+                  { color: C.textSecondary },
+                  wonSet && { color: C.accent, fontWeight: '900' },
+                ]}>
+                  {games}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      ) : (
+        <Text style={[styles.score, { color: scoreColor }]}>
+          {isScheduled ? '--' : team.score}
+        </Text>
+      )}
     </View>
   );
 });
@@ -98,10 +128,19 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     letterSpacing: -1,
   },
-  scoreSet: {
-    fontSize: 15,
-    fontWeight: '800',
-    letterSpacing: 3,
-    minWidth: 52,
+  setsRow: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  setCell: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  setCellText: {
+    fontSize: 14,
+    fontWeight: '700',
   },
 });
