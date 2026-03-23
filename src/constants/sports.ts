@@ -30,12 +30,24 @@ export const SPORTS: SportConfig[] = [
   { id: 'cricket', label: 'Cricket',    sport: 'cricket',    league: 'icc.cricket', icon: 'cricket',                iconOutline: 'cricket',                   tabColor: '#00B4D8', iconFamily: 'MaterialCommunityIcons' },
 ];
 
+export const TENNIS_LEAGUES: LeagueConfig[] = [
+  { id: 'atp', label: 'Men',   sport: 'tennis', league: 'atp' },
+  { id: 'wta', label: 'Women', sport: 'tennis', league: 'wta' },
+];
+
+export const BASKETBALL_LEAGUES: LeagueConfig[] = [
+  { id: 'nba',  label: 'NBA',  sport: 'basketball', league: 'nba' },
+  { id: 'wnba', label: 'WNBA', sport: 'basketball', league: 'wnba' },
+];
+
 export const SOCCER_LEAGUES: LeagueConfig[] = [
   { id: 'mls',        label: 'MLS',        sport: 'soccer', league: 'usa.1' },
   { id: 'epl',        label: 'EPL',        sport: 'soccer', league: 'eng.1' },
   { id: 'laliga',     label: 'La Liga',    sport: 'soccer', league: 'esp.1' },
   { id: 'ucl',        label: 'UCL',        sport: 'soccer', league: 'uefa.champions' },
   { id: 'bundesliga', label: 'Bundesliga', sport: 'soccer', league: 'ger.1' },
+  { id: 'nwsl',       label: 'NWSL',       sport: 'soccer', league: 'usa.nwsl' },
+  { id: 'wsl',        label: 'WSL',        sport: 'soccer', league: 'eng.w.1' },
 ];
 
 export const CRICKET_LEAGUES: LeagueConfig[] = [
