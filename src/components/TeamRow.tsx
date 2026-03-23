@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   record: {
-    fontSize: 11,
+    fontSize: 10,
     marginRight: 8,
   },
   score: {

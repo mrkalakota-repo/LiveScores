@@ -264,10 +264,10 @@ const linen: ColorScheme = {
 
 export const THEMES: Record<ThemeName, ColorScheme> = { carbon, midnight, ember, frost, linen };
 
-export const THEME_META: Record<ThemeName, { label: string; description: string; preview: string; bg: string; textColor: string }> = {
-  carbon:   { label: 'Carbon',   description: 'AMOLED black · electric cyan',   preview: '#00c8ff', bg: '#000000', textColor: '#f5f5f7' },
-  midnight: { label: 'Midnight', description: 'Deep indigo · vibrant violet',   preview: '#c084fc', bg: '#06001a', textColor: '#f0e6ff' },
-  ember:    { label: 'Ember',    description: 'Warm obsidian · amber gold',     preview: '#ffa020', bg: '#0e0800', textColor: '#fff8ec' },
-  frost:    { label: 'Frost',    description: 'Crisp white · sky blue',         preview: '#0071e3', bg: '#ffffff', textColor: '#0c1930' },
-  linen:    { label: 'Linen',    description: 'Warm ivory · rich amber',        preview: '#c07000', bg: '#faf6f0', textColor: '#1c1008' },
+export const THEME_META: Record<ThemeName, { label: string; description: string; preview: string; bg: string; textColor: string; surface: string; textPrimary: string; textMuted: string; live: string }> = {
+  carbon:   { label: 'Carbon',   description: 'AMOLED black · electric cyan',   preview: '#00c8ff', bg: '#000000', textColor: '#f5f5f7', surface: '#0a0a0a', textPrimary: '#f5f5f7', textMuted: '#556a82', live: '#ff2d55' },
+  midnight: { label: 'Midnight', description: 'Deep indigo · vibrant violet',   preview: '#c084fc', bg: '#06001a', textColor: '#f0e6ff', surface: '#0d0028', textPrimary: '#f0e6ff', textMuted: '#6840a0', live: '#ff2d55' },
+  ember:    { label: 'Ember',    description: 'Warm obsidian · amber gold',     preview: '#ffa020', bg: '#0e0800', textColor: '#fff8ec', surface: '#1a1000', textPrimary: '#fff8ec', textMuted: '#7a5828', live: '#ff2d55' },
+  frost:    { label: 'Frost',    description: 'Crisp white · sky blue',         preview: '#0071e3', bg: '#ffffff', textColor: '#0c1930', surface: '#ffffff', textPrimary: '#0c1930', textMuted: '#7a90b0', live: '#e31738' },
+  linen:    { label: 'Linen',    description: 'Warm ivory · rich amber',        preview: '#c07000', bg: '#faf6f0', textColor: '#1c1008', surface: '#ffffff', textPrimary: '#1c1008', textMuted: '#a07848', live: '#c91c30' },
 };

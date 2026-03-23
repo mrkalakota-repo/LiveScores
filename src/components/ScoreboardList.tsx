@@ -101,9 +101,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 18,
-    paddingBottom: 6,
-    gap: 10,
+    paddingTop: 20,
+    paddingBottom: 8,
+    gap: 12,
   },
   sectionTitle: {
     fontSize: 10,

@@ -53,12 +53,12 @@ function createStyles(C: ColorScheme) {
       color: C.textSecondary,
     },
     centerLabel: {
-      fontSize: 9,
-      fontWeight: '800',
+      fontSize: 10,
+      fontWeight: '700',
       letterSpacing: 1.2,
       color: C.textMuted,
       textAlign: 'center',
-      paddingBottom: 4,
+      paddingBottom: 8,
       paddingHorizontal: 6,
     },
     track: {

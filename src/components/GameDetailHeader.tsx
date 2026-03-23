@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 28,
+    paddingVertical: 36,
     borderBottomWidth: 1,
   },
   teamCol: {
@@ -100,16 +100,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoInitial: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 26,
+    fontWeight: '900',
   },
   abbrev: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 0.5,
   },
   record: {
-    fontSize: 11,
+    fontSize: 10,
   },
   score: {
     fontSize: 64,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   },
   vs: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   setsLabel: {
     fontSize: 10,

@@ -100,8 +100,8 @@ export default function TabLayout() {
           },
           headerTintColor: C.textPrimary,
           headerTitleStyle: {
-            fontWeight: '800',
-            fontSize: 17,
+            fontWeight: '900',
+            fontSize: 18,
             letterSpacing: 0.3,
           },
           tabBarStyle: {
