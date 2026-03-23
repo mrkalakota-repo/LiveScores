@@ -27,11 +27,11 @@ function createStyles(C: ColorScheme) {
     navBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: 12,
+      paddingHorizontal: 16,
       paddingTop: 56,
       paddingBottom: 12,
       backgroundColor: C.background,
-      borderBottomWidth: 1,
+      borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: C.border,
     },
     backBtn: {
@@ -43,23 +43,23 @@ function createStyles(C: ColorScheme) {
     backLabel: {
       color: C.textPrimary,
       fontSize: 15,
-      fontWeight: '700',
+      fontWeight: '600',
     },
     navTitle: {
       flex: 1,
       textAlign: 'center',
       color: C.textPrimary,
-      fontSize: 15,
-      fontWeight: '700',
-      letterSpacing: 0.3,
+      fontSize: 16,
+      fontWeight: '800',
+      letterSpacing: -0.3,
     },
     refreshBtn: { minWidth: 70, alignItems: 'flex-end' },
     miniHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: 8,
-      borderBottomWidth: 1,
+      paddingVertical: 10,
+      borderBottomWidth: StyleSheet.hairlineWidth,
       gap: 12,
     },
     miniTeam: {
@@ -88,27 +88,25 @@ function createStyles(C: ColorScheme) {
     },
     errorSub: { color: C.textSecondary, fontSize: 13, textAlign: 'center' },
     retryBtn: {
-      paddingHorizontal: 24,
-      paddingVertical: 10,
-      borderRadius: 10,
-      marginTop: 4,
+      paddingHorizontal: 28,
+      paddingVertical: 12,
+      borderRadius: 12,
+      marginTop: 8,
     },
-    retryText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+    retryText: { color: '#fff', fontWeight: '800', fontSize: 15 },
     scroll: { flex: 1 },
     scrollContent: { paddingBottom: 32 },
     card: {
       backgroundColor: C.surface,
-      marginHorizontal: 12,
+      marginHorizontal: 16,
       marginTop: 12,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: C.border,
-      padding: 16,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: C.isDark ? 0.5 : 0.06,
-      shadowRadius: 10,
-      elevation: 5,
+      borderRadius: 20,
+      padding: 18,
+      shadowColor: C.isDark ? '#000' : '#64748b',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: C.isDark ? 0.4 : 0.08,
+      shadowRadius: 16,
+      elevation: 6,
     },
     sectionHeader: {
       flexDirection: 'row',
@@ -117,15 +115,15 @@ function createStyles(C: ColorScheme) {
       marginBottom: 12,
     },
     sectionTitle: {
-      fontSize: 10,
-      fontWeight: '800',
+      fontSize: 11,
+      fontWeight: '900',
       letterSpacing: 1.5,
       color: C.accent,
     },
     sectionLine: {
       flex: 1,
-      height: 1,
-      opacity: 0.2,
+      height: StyleSheet.hairlineWidth,
+      opacity: 0.3,
     },
     infoRow: {
       flexDirection: 'row',
@@ -353,7 +351,7 @@ export default function GameDetailScreen() {
             });
             if (!wp) return null;
             return (
-              <View style={[styles.card, { shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+              <View style={styles.card}>
                 <WinProbabilityBar
                   homeTeam={data.homeTeam}
                   awayTeam={data.awayTeam}
@@ -377,7 +375,7 @@ export default function GameDetailScreen() {
 
           {/* Line scores */}
           {(data.homeTeam.linescores?.length ?? 0) > 0 && (
-            <View style={[styles.card, { shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+            <View style={styles.card}>
               <LineScores
                 sport={sport ?? ''}
                 homeTeam={data.homeTeam}
@@ -388,7 +386,7 @@ export default function GameDetailScreen() {
 
           {/* Game info */}
           {(data.venue || data.broadcasts.length > 0) && (
-            <View style={[styles.card, { shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+            <View style={styles.card}>
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: C.accent }]}>GAME INFO</Text>
                 <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
@@ -410,7 +408,7 @@ export default function GameDetailScreen() {
 
           {/* Team stats */}
           {(data.homeStats.length > 0 || data.awayStats.length > 0) && (
-            <View style={[styles.card, { shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+            <View style={styles.card}>
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: C.accent }]}>TEAM STATS</Text>
                 <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
@@ -435,7 +433,7 @@ export default function GameDetailScreen() {
 
           {/* Player stats */}
           {data.playerLines.length > 0 && (
-            <View style={[styles.card, { shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+            <View style={styles.card}>
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: C.accent }]}>PLAYER STATS</Text>
                 <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
@@ -484,7 +482,7 @@ export default function GameDetailScreen() {
 
           {/* Recent plays */}
           {data.recentPlays.length > 0 && (
-            <View style={[styles.card, { shadowOpacity: C.isDark ? 0.5 : 0.12 }]}>
+            <View style={styles.card}>
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, { color: C.accent }]}>RECENT PLAYS</Text>
                 <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />

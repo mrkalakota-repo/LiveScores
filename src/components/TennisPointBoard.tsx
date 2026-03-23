@@ -138,8 +138,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   sectionTitle: {
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 11,
+    fontWeight: '900',
     letterSpacing: 1.5,
     marginBottom: 10,
   },
@@ -148,8 +148,8 @@ const styles = StyleSheet.create({
   },
   scoreBoard: {
     flexDirection: 'row',
-    borderRadius: 14,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
     marginBottom: 6,
   },
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   gamePoint: {
-    fontSize: 42,
+    fontSize: 44,
     fontWeight: '900',
     letterSpacing: -1,
   },

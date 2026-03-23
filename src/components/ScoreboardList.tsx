@@ -45,6 +45,7 @@ export function ScoreboardList({
   const renderSectionHeader = useCallback(
     ({ section }: { section: { title: string } }) => (
       <View style={styles.sectionHeader}>
+        <View style={[styles.sectionDot, { backgroundColor: C.accent }]} />
         <Text style={[styles.sectionTitle, { color: C.accent }]}>{section.title}</Text>
         <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
       </View>
@@ -95,27 +96,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingBottom: 16,
+    paddingBottom: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingTop: 24,
     paddingBottom: 8,
-    gap: 12,
+    gap: 8,
+  },
+  sectionDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   sectionTitle: {
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 11,
+    fontWeight: '900',
     letterSpacing: 1.5,
   },
   sectionLine: {
     flex: 1,
-    height: 1,
-    opacity: 0.2,
+    height: StyleSheet.hairlineWidth,
+    opacity: 0.3,
   },
   footer: {
-    height: 16,
+    height: 20,
   },
 });

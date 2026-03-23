@@ -128,8 +128,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1,
+    fontWeight: '900',
+    letterSpacing: 1.5,
     marginBottom: 10,
   },
   row: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dataRow: {
-    borderTopWidth: 1,
+    borderTopWidth: StyleSheet.hairlineWidth,
     paddingVertical: 8,
   },
   teamAbbrev: {

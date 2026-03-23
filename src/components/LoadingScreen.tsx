@@ -4,13 +4,13 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { ColorScheme } from '@/constants/themes';
 
 function SkeletonBox({ style }: { style: object }) {
-  const opacity = useRef(new Animated.Value(0.4)).current;
+  const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.9, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.4, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.7, duration: 800, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.3, duration: 800, useNativeDriver: true }),
       ]),
     );
     anim.start();
@@ -22,44 +22,47 @@ function SkeletonBox({ style }: { style: object }) {
 
 function createStyles(C: ColorScheme) {
   return StyleSheet.create({
-    container: { paddingTop: 8 },
+    container: { paddingTop: 12 },
     card: {
       backgroundColor: C.surface,
-      marginHorizontal: 12,
-      marginVertical: 8,
-      borderRadius: 16,
+      marginHorizontal: 16,
+      marginVertical: 6,
+      borderRadius: 20,
       padding: 16,
-      borderWidth: 1,
-      borderColor: C.border,
-      gap: 10,
+      gap: 12,
+      shadowColor: C.isDark ? '#000' : '#64748b',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: C.isDark ? 0.4 : 0.08,
+      shadowRadius: 16,
+      elevation: 6,
     },
     badge: {
-      height: 20,
-      width: 70,
-      borderRadius: 6,
+      height: 22,
+      width: 72,
+      borderRadius: 8,
       backgroundColor: C.surfaceElevated,
     },
     teamRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 10,
+      gap: 12,
     },
     logo: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
+      width: 38,
+      height: 38,
+      borderRadius: 19,
       backgroundColor: C.surfaceElevated,
     },
     name: {
       height: 14,
       width: 80,
-      borderRadius: 4,
+      borderRadius: 7,
       backgroundColor: C.surfaceElevated,
     },
     score: {
-      height: 20,
-      width: 32,
-      borderRadius: 4,
+      height: 24,
+      width: 36,
+      borderRadius: 8,
       backgroundColor: C.surfaceElevated,
       marginLeft: 'auto',
     },

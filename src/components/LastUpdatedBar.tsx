@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
-    paddingVertical: 6,
+    gap: 5,
+    paddingVertical: 8,
   },
-  text: { fontSize: 11 },
+  text: { fontSize: 11, fontWeight: '500', letterSpacing: 0.2 },
 });

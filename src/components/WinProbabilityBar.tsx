@@ -34,10 +34,10 @@ function createStyles(C: ColorScheme) {
       justifyContent: 'flex-end',
     },
     pct: {
-      fontSize: 26,
+      fontSize: 28,
       fontWeight: '900',
       color: C.textMuted,
-      letterSpacing: -0.5,
+      letterSpacing: -1,
     },
     pctLeading: {
       color: C.textPrimary,
@@ -54,8 +54,8 @@ function createStyles(C: ColorScheme) {
     },
     centerLabel: {
       fontSize: 10,
-      fontWeight: '700',
-      letterSpacing: 1.2,
+      fontWeight: '800',
+      letterSpacing: 1.5,
       color: C.textMuted,
       textAlign: 'center',
       paddingBottom: 8,
@@ -63,8 +63,8 @@ function createStyles(C: ColorScheme) {
     },
     track: {
       flexDirection: 'row',
-      height: 10,
-      borderRadius: 5,
+      height: 8,
+      borderRadius: 4,
       overflow: 'hidden',
       backgroundColor: C.surfaceElevated,
     },

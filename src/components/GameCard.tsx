@@ -7,12 +7,8 @@ import type { ColorScheme } from '@/constants/themes';
 
 /**
  * Extract the in-game point score from a live tennis statusText.
- * ESPN's shortDetail can be "30-15", "Deuce", "Advantage Federer",
- * "Set 2, 5-4, 30-15", etc.
- * Returns a short display string or null when no point score is present.
  */
 function extractTennisPoint(statusText: string): string | null {
-  // Standard game-point patterns: "30-15", "40:30", "0-40", "AD-40"
   const scoreMatch = statusText.match(/\b(0|15|30|40|AD|A)\s*[-:]\s*(0|15|30|40|AD|A)\b/i);
   if (scoreMatch) {
     const a = scoreMatch[1].toUpperCase().replace(/^A$/, 'AD');
@@ -37,78 +33,78 @@ function createStyles(C: ColorScheme) {
     card: {
       flexDirection: 'row',
       backgroundColor: C.surface,
-      marginHorizontal: 12,
-      marginVertical: 8,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: C.border,
+      marginHorizontal: 16,
+      marginVertical: 6,
+      borderRadius: 20,
       overflow: 'hidden',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: C.isDark ? 0.5 : 0.08,
-      shadowRadius: 10,
-      elevation: 5,
+      shadowColor: C.isDark ? '#000' : '#64748b',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: C.isDark ? 0.6 : 0.15,
+      shadowRadius: 16,
+      elevation: 8,
     },
     cardLive: {
-      shadowOffset: { width: 0, height: 0 },
-      shadowRadius: 18,
-      elevation: 10,
+      shadowColor: C.live,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: C.isDark ? 0.5 : 0.25,
+      shadowRadius: 24,
+      elevation: 12,
     },
     accent: {
-      width: 6,
-      borderTopLeftRadius: 16,
-      borderBottomLeftRadius: 16,
+      width: 4,
     },
     inner: {
       flex: 1,
       paddingHorizontal: 16,
-      paddingTop: 12,
-      paddingBottom: 12,
+      paddingTop: 14,
+      paddingBottom: 14,
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: 8,
+      marginBottom: 10,
     },
     broadcast: {
       fontSize: 10,
+      fontWeight: '500',
       color: C.textMuted,
       flexShrink: 1,
       marginLeft: 8,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
     },
     divider: {
-      height: 1,
+      height: StyleSheet.hairlineWidth,
       backgroundColor: C.border,
-      marginVertical: 1,
-      opacity: 0.4,
+      marginVertical: 2,
     },
     situation: {
-      fontSize: 11,
+      fontSize: 12,
       color: C.textSecondary,
-      marginTop: 8,
+      marginTop: 10,
       fontStyle: 'italic',
-      lineHeight: 16,
+      lineHeight: 17,
     },
     tennisPoint: {
-      fontSize: 13,
-      fontWeight: '800',
+      fontSize: 14,
+      fontWeight: '900',
       color: C.live,
-      marginTop: 8,
-      letterSpacing: 0.5,
+      marginTop: 10,
+      letterSpacing: 1,
       textAlign: 'center',
     },
     probRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginTop: 8,
+      marginTop: 12,
       gap: 8,
     },
     probTrack: {
       flex: 1,
-      height: 6,
+      height: 5,
       flexDirection: 'row',
-      borderRadius: 2,
+      borderRadius: 3,
       overflow: 'hidden',
       backgroundColor: C.surfaceElevated,
     },
@@ -117,21 +113,21 @@ function createStyles(C: ColorScheme) {
       backgroundColor: C.border,
     },
     probDivider: {
-      width: 1,
+      width: 2,
       height: '100%',
-      backgroundColor: C.background,
+      backgroundColor: C.surface,
     },
     probLabel: {
       flexDirection: 'row',
       alignItems: 'baseline',
-      gap: 4,
+      gap: 3,
       minWidth: 52,
     },
     probLabelRight: {
       justifyContent: 'flex-end',
     },
     probAbbrev: {
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: '700',
       color: C.textMuted,
       letterSpacing: 0.3,
@@ -148,16 +144,16 @@ export const GameCard = memo(function GameCard({ game }: Props) {
   const { C } = useTheme();
   const styles = useMemo(() => createStyles(C), [C]);
   const router = useRouter();
-  const accentColor = { live: C.live, halftime: C.halftime, scheduled: C.scheduled, final: C.final }[game.status] ?? C.border;
+  const accentColor = { live: C.live, halftime: C.halftime, scheduled: C.accent, final: C.border }[game.status] ?? C.border;
   const isLive = game.status === 'live' || game.status === 'halftime';
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = useCallback(() => {
-    Animated.timing(scaleAnim, { toValue: 0.975, duration: 100, useNativeDriver: true }).start();
+    Animated.timing(scaleAnim, { toValue: 0.97, duration: 80, useNativeDriver: true }).start();
   }, [scaleAnim]);
 
   const handlePressOut = useCallback(() => {
-    Animated.timing(scaleAnim, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+    Animated.timing(scaleAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
   }, [scaleAnim]);
 
   const handlePress = useCallback(() => {
@@ -175,16 +171,8 @@ export const GameCard = memo(function GameCard({ game }: Props) {
     <Pressable
       style={[
         styles.card,
-        {
-          backgroundColor: C.surface,
-          borderColor: C.border,
-          shadowOpacity: C.isDark ? 0.5 : 0.12,
-        },
         isLive && [styles.cardLive, {
           backgroundColor: C.liveCardBackground,
-          borderColor: C.liveBorder,
-          shadowColor: C.live,
-          shadowOpacity: C.isDark ? 0.35 : 0.15,
         }],
       ]}
       onPress={handlePress}

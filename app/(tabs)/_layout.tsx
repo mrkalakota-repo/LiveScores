@@ -68,9 +68,9 @@ function LiveTabIcon({ sport, color, focused, hasLive }: LiveTabIconProps) {
   return (
     <View style={styles.iconWrap}>
       {sport.iconFamily === 'MaterialCommunityIcons' ? (
-        <MaterialCommunityIcons name={iconName as MCIName} size={22} color={iconColor} />
+        <MaterialCommunityIcons name={iconName as MCIName} size={24} color={iconColor} />
       ) : (
-        <Ionicons name={iconName as IoniconName} size={22} color={iconColor} />
+        <Ionicons name={iconName as IoniconName} size={24} color={iconColor} />
       )}
       {!focused && hasLive && (
         <Animated.View style={[styles.liveDot, { opacity: pulseAnim }]} />
@@ -95,34 +95,35 @@ export default function TabLayout() {
           headerStyle: {
             backgroundColor: C.background,
             shadowColor: 'transparent',
-            borderBottomWidth: 1,
+            borderBottomWidth: StyleSheet.hairlineWidth,
             borderBottomColor: C.border,
           },
           headerTintColor: C.textPrimary,
           headerTitleStyle: {
             fontWeight: '900',
-            fontSize: 18,
-            letterSpacing: 0.3,
+            fontSize: 20,
+            letterSpacing: -0.3,
           },
           tabBarStyle: {
             backgroundColor: C.tabBarBackground,
             borderTopWidth: 0,
-            height: 58,
+            height: 62,
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: -6 },
-            shadowOpacity: 0.5,
-            shadowRadius: 16,
-            elevation: 16,
+            shadowOffset: { width: 0, height: -8 },
+            shadowOpacity: C.isDark ? 0.6 : 0.08,
+            shadowRadius: 20,
+            elevation: 20,
           },
           tabBarInactiveTintColor: C.tabInactive,
           tabBarLabelStyle: {
             fontSize: 10,
-            fontWeight: '700',
-            letterSpacing: 0.3,
+            fontWeight: '600',
+            letterSpacing: 0.2,
+            marginTop: -2,
           },
           tabBarItemStyle: {
-            height: 56,
-            width: 64,
+            height: 60,
+            width: 68,
             justifyContent: 'center',
           },
           tabBarScrollEnabled: true,
@@ -161,7 +162,7 @@ export default function TabLayout() {
             tabBarActiveTintColor: C.accent,
             tabBarIcon: ({ color }) => (
               <View style={styles.iconWrap}>
-                <Ionicons name="ellipsis-horizontal" size={22} color={color} />
+                <Ionicons name="ellipsis-horizontal" size={24} color={color} />
                 {morHasLive && <View style={styles.liveDot} />}
               </View>
             ),
@@ -174,7 +175,7 @@ export default function TabLayout() {
             title: 'Settings',
             tabBarActiveTintColor: C.accent,
             tabBarIcon: ({ color }) => (
-              <Ionicons name="settings-outline" size={22} color={color} />
+              <Ionicons name="settings-outline" size={24} color={color} />
             ),
           }}
         />
@@ -190,11 +191,11 @@ const styles = StyleSheet.create({
   },
   liveDot: {
     position: 'absolute',
-    top: -3,
-    right: -5,
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
+    top: -2,
+    right: -6,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: Colors.tabLive,
   },
 });
