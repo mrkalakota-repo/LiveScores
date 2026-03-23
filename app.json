@@ -13,12 +13,12 @@
       "backgroundColor": "#1668d4"
     },
     "ios": {
-      "bundleIdentifier": "com.sports.livescores",
+      "bundleIdentifier": "com.mrkalakota.livescores",
       "buildNumber": "1",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.sports.livescores",
+      "package": "com.mrkalakota.livescores",
       "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#1668d4",
