@@ -8,6 +8,7 @@ import { LoadingScreen } from './LoadingScreen';
 import { ErrorScreen } from './ErrorScreen';
 import { EmptyState } from './EmptyState';
 import { LastUpdatedBar } from './LastUpdatedBar';
+import { AdBanner } from './AdBanner';
 import { AppError } from '@/api/errors';
 import type { GameData } from '@/api/types';
 
@@ -72,7 +73,11 @@ export function ScoreboardList({
         keyExtractor={item => item.id}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        ListFooterComponent={<View style={styles.footer} />}
+        ListFooterComponent={
+          <View style={styles.footer}>
+            <AdBanner />
+          </View>
+        }
         contentContainerStyle={styles.content}
         stickySectionHeadersEnabled={false}
         removeClippedSubviews
@@ -122,6 +127,8 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   footer: {
-    height: 20,
+    paddingTop: 12,
+    paddingBottom: 20,
+    alignItems: 'center',
   },
 });

@@ -4,7 +4,7 @@ import { classifyError } from '@/api/errors';
 import { getGameStatus, getStatusText } from '@/utils/statusHelpers';
 import { formatGameTime } from '@/utils/dateHelpers';
 import type { AppError } from '@/api/errors';
-import type { GameData, GameStatus, Play, PlayerLine, StatLine, TeamInfo } from '@/api/types';
+import type { GameData, GameStatus, Play, PlayerLine, StatLine, TeamInfo, CricketInningsData, CricketBatsman, CricketBowler } from '@/api/types';
 import { computeWinProbability } from '@/utils/winProbability';
 import type { WinProbability } from '@/utils/winProbability';
 
@@ -64,8 +64,9 @@ export interface GameSummaryData {
   homeStats: StatLine[];
   awayStats: StatLine[];
   recentPlays: Play[];
-  playerLines: PlayerLine[];  // top players from both teams, grouped by category
+  playerLines: PlayerLine[];
   winProbability: WinProbability | null;
+  cricketInnings?: CricketInningsData[];
 }
 
 // Box score stats — key sport-relevant stats only
@@ -177,6 +178,107 @@ export function useGameSummary(
         const homeStats = extractStats(raw, homeTeam.abbreviation);
         const awayStats = extractStats(raw, awayTeam.abbreviation);
 
+        // ── Cricket innings extraction ──────────────────────────────
+        let cricketInnings: CricketInningsData[] | undefined;
+        if (sport === 'cricket' && raw.rosters && raw.rosters.length > 0) {
+          // Get linescores from header for over-by-over + summary stats
+          const headerComps = competition.competitors ?? [];
+          const inningsMap = new Map<string, CricketInningsData>();
+
+          for (const hc of headerComps) {
+            const abbrev = (hc.team as { abbreviation?: string }).abbreviation ?? '';
+            for (const ls of hc.linescores ?? []) {
+              const lsAny = ls as Record<string, unknown>;
+              const statsObj = (lsAny.statistics ?? {}) as Record<string, unknown>;
+              const cats = ((statsObj.categories ?? []) as Array<{ stats: Array<{ name: string; displayValue: string }> }>);
+              const statMap: Record<string, string> = {};
+              for (const cat of cats) {
+                for (const s of cat.stats ?? []) {
+                  statMap[s.name] = s.displayValue;
+                }
+              }
+
+              const oversArr = (statsObj.overs ?? [[]]) as Array<Array<{ number: string; runs: string }>>;
+              const recentOvers = (oversArr[0] ?? []).slice(-6).map(o => o.runs);
+
+              const key = `${abbrev}-${lsAny.period}`;
+              inningsMap.set(key, {
+                teamAbbrev: abbrev,
+                score: (lsAny.score as string) ?? `${statMap.runs ?? '0'}/${statMap.wickets ?? '0'}`,
+                overs: statMap.overs ?? String(lsAny.overs ?? ''),
+                runRate: statMap.runRate ?? '',
+                extras: statMap.extras ?? '',
+                batsmen: [],
+                bowlers: [],
+                recentOvers,
+              });
+            }
+          }
+
+          // Fill in batsmen and bowlers from rosters
+          for (const roster of raw.rosters) {
+            const rosterAbbrev = roster.team.abbreviation;
+            for (const entry of roster.roster) {
+              const name = entry.athlete.displayName;
+              for (const ls of entry.linescores ?? []) {
+                const statMap: Record<string, string> = {};
+                for (const cat of ls.statistics?.categories ?? []) {
+                  for (const s of cat.stats) {
+                    statMap[s.name] = s.displayValue;
+                  }
+                }
+
+                const runs = statMap.runs ?? '';
+                const ballsFaced = statMap.ballsFaced ?? '';
+                const overs = statMap.overs ?? '';
+                const wickets = statMap.wickets ?? '';
+
+                // Batting: this player batted for their own team
+                if (ballsFaced && ballsFaced !== '0') {
+                  const key = `${rosterAbbrev}-${ls.period}`;
+                  const inn = inningsMap.get(key);
+                  if (inn) {
+                    inn.batsmen.push({
+                      name,
+                      runs,
+                      balls: ballsFaced,
+                      fours: statMap.fours ?? '0',
+                      sixes: statMap.sixes ?? '0',
+                      strikeRate: statMap.strikeRate ?? '',
+                      dismissal: statMap.dismissal ?? statMap.dismissalCard ?? '',
+                      isBatting: statMap.notouts === '1' || statMap.batted === '1',
+                    });
+                  }
+                }
+
+                // Bowling: this player bowled for the other team's innings
+                if (overs && overs !== '0' && overs !== '0.0') {
+                  // Find the opponent's innings
+                  const opponentAbbrev = rosterAbbrev === homeTeam.abbreviation
+                    ? awayTeam.abbreviation : homeTeam.abbreviation;
+                  const key = `${opponentAbbrev}-${ls.period}`;
+                  const inn = inningsMap.get(key);
+                  if (inn) {
+                    inn.bowlers.push({
+                      name,
+                      overs,
+                      maidens: statMap.maidens ?? '0',
+                      runs: statMap.conceded ?? '0',
+                      wickets,
+                      economy: statMap.economyRate ?? '',
+                    });
+                  }
+                }
+              }
+            }
+          }
+
+          cricketInnings = [...inningsMap.values()].filter(
+            inn => inn.batsmen.length > 0 || inn.bowlers.length > 0 || inn.score !== '0/0'
+          );
+          if (cricketInnings.length === 0) cricketInnings = undefined;
+        }
+
         return {
           homeTeam,
           awayTeam,
@@ -199,6 +301,7 @@ export function useGameSummary(
             statusText,
             sport,
           }),
+          cricketInnings,
         };
       } catch (err) {
         const appError = classifyError(err);

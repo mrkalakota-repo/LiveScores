@@ -166,6 +166,24 @@ export interface EspnSummaryResponse {
     scoreValue?: number;
     team?: { abbreviation?: string };
   }>;
+  // Cricket rosters with per-player per-innings stats
+  rosters?: Array<{
+    homeAway?: string;
+    team: { abbreviation: string };
+    roster: Array<{
+      athlete: { id?: string; displayName: string };
+      linescores?: Array<{
+        period: number;
+        statistics?: {
+          categories?: Array<{
+            name: string;
+            stats: Array<{ name: string; value: number | string; displayValue: string }>;
+          }>;
+          overs?: Array<Array<{ number: string; runs: string; wicket: unknown[] }>>;
+        };
+      }>;
+    }>;
+  }>;
 }
 
 export interface StatLine {
@@ -195,4 +213,37 @@ export interface Play {
   clock?: string;
   team?: string;
   isScore: boolean;
+}
+
+// ── Cricket-specific types ──────────────────────────────────────────────────
+
+export interface CricketBatsman {
+  name: string;
+  runs: string;
+  balls: string;
+  fours: string;
+  sixes: string;
+  strikeRate: string;
+  dismissal: string;
+  isBatting: boolean;
+}
+
+export interface CricketBowler {
+  name: string;
+  overs: string;
+  maidens: string;
+  runs: string;
+  wickets: string;
+  economy: string;
+}
+
+export interface CricketInningsData {
+  teamAbbrev: string;
+  score: string;
+  overs: string;
+  runRate: string;
+  extras: string;
+  batsmen: CricketBatsman[];
+  bowlers: CricketBowler[];
+  recentOvers: string[];
 }

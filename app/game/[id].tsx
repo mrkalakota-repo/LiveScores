@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -19,7 +19,9 @@ import { GameDetailHeader } from '@/components/GameDetailHeader';
 import { LineScores } from '@/components/LineScores';
 import { WinProbabilityBar } from '@/components/WinProbabilityBar';
 import { TennisPointBoard } from '@/components/TennisPointBoard';
+import { CricketScorecard } from '@/components/CricketScorecard';
 import { computeWinProbability } from '@/utils/winProbability';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 
 function createStyles(C: ColorScheme) {
   return StyleSheet.create({
@@ -259,6 +261,10 @@ export default function GameDetailScreen() {
     id ?? '',
   );
 
+  // Show interstitial ad on game detail open (throttled by cooldown)
+  const { show: showInterstitial } = useInterstitialAd();
+  useEffect(() => { showInterstitial(); }, [showInterstitial]);
+
   const handleBack = useCallback(() => {
     if (router.canGoBack()) router.back();
     else router.replace('/');
@@ -381,6 +387,17 @@ export default function GameDetailScreen() {
                 homeTeam={data.homeTeam}
                 awayTeam={data.awayTeam}
               />
+            </View>
+          )}
+
+          {/* Cricket scorecard */}
+          {sport === 'cricket' && data.cricketInnings && data.cricketInnings.length > 0 && (
+            <View style={styles.card}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: C.accent }]}>SCORECARD</Text>
+                <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
+              </View>
+              <CricketScorecard innings={data.cricketInnings} />
             </View>
           )}
 
