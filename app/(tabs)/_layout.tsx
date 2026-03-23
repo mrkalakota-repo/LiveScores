@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, Platform, StyleSheet, View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSportPreferences } from '@/contexts/SportPreferencesContext';
@@ -83,9 +84,13 @@ export default function TabLayout() {
   const { liveCounts } = useLiveGames();
   const { C } = useTheme();
   const { isSelected } = useSportPreferences();
+  const insets = useSafeAreaInsets();
 
   // Does any unselected sport have live games?
   const morHasLive = SPORTS.some(s => !isSelected(s.id) && (liveCounts[s.id] ?? 0) > 0);
+
+  // Account for Android gesture nav / 3-button nav bar
+  const tabBarHeight = 62 + (Platform.OS === 'android' ? insets.bottom : 0);
 
   return (
     <>
@@ -107,7 +112,8 @@ export default function TabLayout() {
           tabBarStyle: {
             backgroundColor: C.tabBarBackground,
             borderTopWidth: 0,
-            height: 62,
+            height: tabBarHeight,
+            paddingBottom: Platform.OS === 'android' ? insets.bottom : 0,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: -8 },
             shadowOpacity: C.isDark ? 0.6 : 0.08,
