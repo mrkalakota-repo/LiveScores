@@ -58,6 +58,11 @@ function createStyles(C: ColorScheme) {
       letterSpacing: -2,
       lineHeight: 70,
     },
+    scoreCricket: {
+      fontSize: 36,
+      letterSpacing: -1,
+      lineHeight: 42,
+    },
     middle: {
       alignItems: 'center',
       gap: 8,
@@ -81,9 +86,10 @@ interface TeamColProps {
   gameStatus: GameStatus;
   align: 'left' | 'right';
   isTennis?: boolean;
+  isCricket?: boolean;
 }
 
-const TeamCol = memo(function TeamCol({ team, gameStatus, align, isTennis }: TeamColProps) {
+const TeamCol = memo(function TeamCol({ team, gameStatus, align, isTennis, isCricket }: TeamColProps) {
   const { C } = useTheme();
   const styles = useMemo(() => createStyles(C), [C]);
   const isFinal = gameStatus === 'final';
@@ -105,7 +111,11 @@ const TeamCol = memo(function TeamCol({ team, gameStatus, align, isTennis }: Tea
       )}
       <Text style={[styles.abbrev, { color: nameColor }]}>{team.abbreviation}</Text>
       {team.record && <Text style={[styles.record, { color: C.textMuted }]}>{team.record}</Text>}
-      <Text style={[styles.score, { color: scoreColor }]}>
+      <Text style={[
+        styles.score,
+        isCricket && styles.scoreCricket,
+        { color: scoreColor },
+      ]}>
         {isScheduled ? '--' : team.score}
       </Text>
       {isTennis && !isScheduled && (
@@ -127,10 +137,11 @@ export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayT
   const { C } = useTheme();
   const styles = useMemo(() => createStyles(C), [C]);
   const isTennis = sport === 'tennis';
+  const isCricket = sport === 'cricket';
 
   return (
     <View style={styles.container}>
-      <TeamCol team={awayTeam} gameStatus={status} align="left" isTennis={isTennis} />
+      <TeamCol team={awayTeam} gameStatus={status} align="left" isTennis={isTennis} isCricket={isCricket} />
 
       <View style={styles.middle}>
         <StatusBadge status={status} statusText={statusText} />
@@ -139,7 +150,7 @@ export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayT
         )}
       </View>
 
-      <TeamCol team={homeTeam} gameStatus={status} align="right" isTennis={isTennis} />
+      <TeamCol team={homeTeam} gameStatus={status} align="right" isTennis={isTennis} isCricket={isCricket} />
     </View>
   );
 });

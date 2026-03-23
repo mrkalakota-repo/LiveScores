@@ -43,35 +43,41 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
   if (periodCount === 0) return null;
 
   const isTennis = sport === 'tennis';
+  const isCricket = sport === 'cricket';
   const labels = periodLabels(sport, periodCount);
   const totalLabel = isTennis ? 'SETS' : 'T';
+  const sectionLabel = isTennis ? 'SET SCORES' : isCricket ? 'INNINGS' : 'LINE SCORE';
+  const colWidth = isCricket ? 64 : COL_W;
+  const teamWidth = isCricket ? 56 : TEAM_W;
 
   return (
     <View style={styles.wrapper}>
       <Text style={[styles.sectionTitle, { color: C.textMuted }]}>
-        {isTennis ? 'SET SCORES' : 'LINE SCORE'}
+        {sectionLabel}
       </Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View>
           {/* Header row */}
           <View style={styles.row}>
-            <Text style={[styles.teamAbbrev, styles.headerCell, { color: C.textMuted }]} />
+            <Text style={[{ width: teamWidth }, styles.headerCell, { color: C.textMuted }]} />
             {labels.map(lbl => (
-              <Text key={lbl} style={[styles.cell, styles.headerCell, { color: C.textMuted }]}>{lbl}</Text>
+              <Text key={lbl} style={[{ width: colWidth }, styles.headerCell, { color: C.textMuted, textAlign: 'center' }]}>{lbl}</Text>
             ))}
-            <Text style={[styles.totalCell, styles.headerCell, { color: C.textMuted }]}>{totalLabel}</Text>
+            {!isCricket && (
+              <Text style={[styles.totalCell, styles.headerCell, { color: C.textMuted }]}>{totalLabel}</Text>
+            )}
           </View>
 
           {/* Away row */}
           <View style={[styles.row, styles.dataRow, { borderTopColor: C.border }]}>
-            <Text style={[styles.teamAbbrev, styles.teamLabel, { color: C.textPrimary }]}>{awayTeam.abbreviation}</Text>
+            <Text style={[{ width: teamWidth }, styles.teamLabel, { color: C.textPrimary, fontSize: 13, fontWeight: '700' }]}>{awayTeam.abbreviation}</Text>
             {labels.map((_, i) => {
               const av = awayLS[i];
               const hv = homeLS[i];
               const awayWinsSet = isTennis && av !== undefined && hv !== undefined && av > hv;
               return (
                 <Text key={i} style={[
-                  styles.cell,
+                  { width: colWidth, textAlign: 'center', fontSize: 13 },
                   { color: C.textSecondary },
                   awayWinsSet && { color: C.winnerScore, fontWeight: '900' },
                 ]}>
@@ -79,25 +85,27 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
                 </Text>
               );
             })}
-            <Text style={[
-              styles.totalCell,
-              { color: C.textPrimary },
-              awayTeam.winner && { color: C.winnerScore },
-            ]}>
-              {isTennis ? String(awayLS.filter((v, i) => v > (homeLS[i] ?? 0)).length) : awayTeam.score}
-            </Text>
+            {!isCricket && (
+              <Text style={[
+                styles.totalCell,
+                { color: C.textPrimary },
+                awayTeam.winner && { color: C.winnerScore },
+              ]}>
+                {isTennis ? String(awayLS.filter((v, i) => v > (homeLS[i] ?? 0)).length) : awayTeam.score}
+              </Text>
+            )}
           </View>
 
           {/* Home row */}
           <View style={[styles.row, styles.dataRow, { borderTopColor: C.border }]}>
-            <Text style={[styles.teamAbbrev, styles.teamLabel, { color: C.textPrimary }]}>{homeTeam.abbreviation}</Text>
+            <Text style={[{ width: teamWidth }, styles.teamLabel, { color: C.textPrimary, fontSize: 13, fontWeight: '700' }]}>{homeTeam.abbreviation}</Text>
             {labels.map((_, i) => {
               const hv = homeLS[i];
               const av = awayLS[i];
               const homeWinsSet = isTennis && hv !== undefined && av !== undefined && hv > av;
               return (
                 <Text key={i} style={[
-                  styles.cell,
+                  { width: colWidth, textAlign: 'center', fontSize: 13 },
                   { color: C.textSecondary },
                   homeWinsSet && { color: C.winnerScore, fontWeight: '900' },
                 ]}>
@@ -105,13 +113,15 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
                 </Text>
               );
             })}
-            <Text style={[
-              styles.totalCell,
-              { color: C.textPrimary },
-              homeTeam.winner && { color: C.winnerScore },
-            ]}>
-              {isTennis ? String(homeLS.filter((v, i) => v > (awayLS[i] ?? 0)).length) : homeTeam.score}
-            </Text>
+            {!isCricket && (
+              <Text style={[
+                styles.totalCell,
+                { color: C.textPrimary },
+                homeTeam.winner && { color: C.winnerScore },
+              ]}>
+                {isTennis ? String(homeLS.filter((v, i) => v > (awayLS[i] ?? 0)).length) : homeTeam.score}
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>
