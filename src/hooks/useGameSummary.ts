@@ -320,7 +320,7 @@ export function useGameSummary(
                 }
 
                 // Bowling: this player bowled for the other team's innings
-                if (overs && overs !== '0' && overs !== '0.0') {
+                if (overs && parseFloat(overs) > 0) {
                   // Find the opponent's innings
                   const opponentAbbrev = rosterAbbrev === homeTeam.abbreviation
                     ? awayTeam.abbreviation : homeTeam.abbreviation;

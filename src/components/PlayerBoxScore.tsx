@@ -123,6 +123,76 @@ const HIGHLIGHT_STATS = new Set([
   'HR', 'RBI', 'SB', 'W', 'SV', 'G', 'A', 'SOG',
 ]);
 
+interface CategoryTableProps {
+  cat: TeamBoxScore['categories'][number];
+  styles: ReturnType<typeof createStyles>;
+  C: ColorScheme;
+}
+
+const CategoryTable = memo(function CategoryTable({ cat, styles, C }: CategoryTableProps) {
+  const colW = Math.max(38, Math.min(52, 240 / Math.max(cat.labels.length, 1)));
+  return (
+    <View>
+      <View style={styles.catHeader}>
+        <Text style={styles.catLabel}>{cat.category.toUpperCase()}</Text>
+        <View style={styles.catLine} />
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View>
+          {/* Column headers */}
+          <View style={styles.tableHeader}>
+            <View style={styles.nameColHeader}>
+              <Text style={styles.headerLabel}>PLAYER</Text>
+            </View>
+            {cat.labels.map(lbl => (
+              <Text
+                key={lbl}
+                style={[styles.headerLabel, { width: colW, textAlign: 'right' }]}
+              >
+                {lbl}
+              </Text>
+            ))}
+          </View>
+
+          {/* Player rows */}
+          {cat.players.map((player, pi) => (
+            <View
+              key={player.id + pi}
+              style={[styles.playerRow, pi % 2 === 1 && styles.playerRowAlt]}
+            >
+              <View style={styles.nameCol}>
+                {player.jersey && (
+                  <Text style={styles.playerJersey}>#{player.jersey}</Text>
+                )}
+                <Text style={styles.playerName} numberOfLines={1}>
+                  {player.name}
+                </Text>
+              </View>
+              {player.stats.map((val, si) => {
+                const label = cat.labels[si] ?? '';
+                const isHighlight = HIGHLIGHT_STATS.has(label)
+                  && val !== '0' && val !== '-' && val !== '';
+                return (
+                  <Text
+                    key={si}
+                    style={[
+                      styles.statValue,
+                      { width: colW, textAlign: 'right' },
+                      isHighlight && styles.statHighlight,
+                    ]}
+                  >
+                    {val}
+                  </Text>
+                );
+              })}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
+  );
+});
+
 interface Props {
   boxScores: TeamBoxScore[];
 }
@@ -159,70 +229,9 @@ export const PlayerBoxScore = memo(function PlayerBoxScore({ boxScores }: Props)
       {team.categories.length === 0 ? (
         <Text style={styles.emptyText}>No player stats available</Text>
       ) : (
-        team.categories.map(cat => {
-          // Compute column width based on number of stat columns
-          const colW = Math.max(38, Math.min(52, 240 / Math.max(cat.labels.length, 1)));
-          return (
-            <View key={cat.category}>
-              <View style={styles.catHeader}>
-                <Text style={styles.catLabel}>{cat.category.toUpperCase()}</Text>
-                <View style={styles.catLine} />
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View>
-                  {/* Column headers */}
-                  <View style={styles.tableHeader}>
-                    <View style={styles.nameColHeader}>
-                      <Text style={styles.headerLabel}>PLAYER</Text>
-                    </View>
-                    {cat.labels.map(lbl => (
-                      <Text
-                        key={lbl}
-                        style={[styles.headerLabel, { width: colW, textAlign: 'right' }]}
-                      >
-                        {lbl}
-                      </Text>
-                    ))}
-                  </View>
-
-                  {/* Player rows */}
-                  {cat.players.map((player, pi) => (
-                    <View
-                      key={player.id + pi}
-                      style={[styles.playerRow, pi % 2 === 1 && styles.playerRowAlt]}
-                    >
-                      <View style={styles.nameCol}>
-                        {player.jersey && (
-                          <Text style={styles.playerJersey}>#{player.jersey}</Text>
-                        )}
-                        <Text style={styles.playerName} numberOfLines={1}>
-                          {player.name}
-                        </Text>
-                      </View>
-                      {player.stats.map((val, si) => {
-                        const label = cat.labels[si] ?? '';
-                        const isHighlight = HIGHLIGHT_STATS.has(label)
-                          && val !== '0' && val !== '-' && val !== '';
-                        return (
-                          <Text
-                            key={si}
-                            style={[
-                              styles.statValue,
-                              { width: colW, textAlign: 'right' },
-                              isHighlight && styles.statHighlight,
-                            ]}
-                          >
-                            {val}
-                          </Text>
-                        );
-                      })}
-                    </View>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-          );
-        })
+        team.categories.map(cat => (
+            <CategoryTable key={cat.category} cat={cat} styles={styles} C={C} />
+        ))
       )}
     </View>
   );

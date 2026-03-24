@@ -53,7 +53,7 @@ export async function fetchScoreboard(
     throw new Error(`Unsupported sport: ${sport}`);
   }
   // Only allow alphanumeric, dots, underscores, and hyphens in league slug
-  if (!/^[\w.\-]+$/.test(league)) {
+  if (!/^[a-z0-9][a-z0-9.\-]*$/i.test(league)) {
     throw new Error(`Invalid league identifier: ${league}`);
   }
 
@@ -82,7 +82,7 @@ export async function fetchGameSummary(
   if (!VALID_SPORTS.has(sport)) {
     throw new Error(`Unsupported sport: ${sport}`);
   }
-  if (!/^[\w.\-]+$/.test(league)) {
+  if (!/^[a-z0-9][a-z0-9.\-]*$/i.test(league)) {
     throw new Error(`Invalid league identifier: ${league}`);
   }
   // Event IDs from ESPN are numeric strings

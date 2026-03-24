@@ -374,12 +374,15 @@ const CricketTeamRow = memo(function CricketTeamRow({ team, gameStatus, innings 
     : isScheduled ? C.textMuted
     : C.textPrimary;
 
-  const recentBalls = innings?.recentBalls ?? [];
+  const recentBalls = innings?.recentBalls;
   // Group into overs, take last 5, reverse so most recent is on the left
-  const allOvers = recentBalls.length > 0 ? groupBallsIntoOvers(recentBalls) : [];
-  const last5Overs = allOvers.slice(-5).reverse();
-  // Also reverse balls within each over so most recent ball is leftmost
-  last5Overs.forEach(over => over.balls.reverse());
+  const last5Overs = useMemo(() => {
+    if (!recentBalls || recentBalls.length === 0) return [];
+    const allOvers = groupBallsIntoOvers(recentBalls);
+    const sliced = allOvers.slice(-5).reverse();
+    sliced.forEach(over => over.balls.reverse());
+    return sliced;
+  }, [recentBalls]);
 
   return (
     <View>
@@ -408,11 +411,7 @@ const CricketTeamRow = memo(function CricketTeamRow({ team, gameStatus, innings 
           </Text>
           <Text style={styles.ballByBallText}>
             {last5Overs.map((over) =>
-              over.balls.map(b => {
-                if (b.isWicket) return 'W';
-                const n = parseInt(b.runs, 10);
-                return (n === 4 || n === 6) ? b.runs : b.runs;
-              }).join(' ')
+              over.balls.map(b => b.isWicket ? 'W' : b.runs).join(' ')
             ).join(' | ')}
           </Text>
         </View>
