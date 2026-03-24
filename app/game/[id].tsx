@@ -256,7 +256,7 @@ export default function GameDetailScreen() {
     league: string;
   }>();
 
-  const safeSport = safeSport;
+  const safeSport = sport ?? '';
   const safeLeague = league ?? '';
   const safeId = id ?? '';
 
