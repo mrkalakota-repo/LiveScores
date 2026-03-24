@@ -9,18 +9,21 @@ interface ThemeContextValue {
   themeName: ThemeName;
   setTheme: (name: ThemeName) => void;
   C: ColorScheme;
+  ready: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   themeName: 'carbon',
   setTheme: () => {},
   C: THEMES.carbon,
+  ready: false,
 });
 
 export { THEME_META };
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeName, setThemeState] = useState<ThemeName>('carbon');
+  const [ready, setReady] = useState(false);
 
   // Load persisted theme on mount
   useEffect(() => {
@@ -28,6 +31,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       if (stored && VALID_THEMES.has(stored)) {
         setThemeState(stored as ThemeName);
       }
+      setReady(true);
     });
   }, []);
 
@@ -40,7 +44,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     themeName,
     setTheme,
     C: THEMES[themeName],
-  }), [themeName, setTheme]);
+    ready,
+  }), [themeName, setTheme, ready]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

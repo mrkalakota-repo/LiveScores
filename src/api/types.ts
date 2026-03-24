@@ -262,6 +262,12 @@ export interface CricketBowler {
   economy: string;
 }
 
+export interface CricketBall {
+  number: string;     // e.g. "3.4"
+  runs: string;       // e.g. "4", "0", "1"
+  isWicket: boolean;
+}
+
 export interface CricketInningsData {
   teamAbbrev: string;
   score: string;
@@ -271,4 +277,5 @@ export interface CricketInningsData {
   batsmen: CricketBatsman[];
   bowlers: CricketBowler[];
   recentOvers: string[];
+  recentBalls: CricketBall[];
 }

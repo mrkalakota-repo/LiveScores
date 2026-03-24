@@ -4,7 +4,7 @@ import { classifyError } from '@/api/errors';
 import { getGameStatus, getStatusText } from '@/utils/statusHelpers';
 import { formatGameTime } from '@/utils/dateHelpers';
 import type { AppError } from '@/api/errors';
-import type { GameData, GameStatus, Play, PlayerLine, StatLine, TeamInfo, CricketInningsData, CricketBatsman, CricketBowler, TeamBoxScore, BoxScoreCategory, BoxScorePlayer } from '@/api/types';
+import type { GameData, GameStatus, Play, PlayerLine, StatLine, TeamInfo, CricketInningsData, CricketBatsman, CricketBowler, CricketBall, TeamBoxScore, BoxScoreCategory, BoxScorePlayer } from '@/api/types';
 import { computeWinProbability } from '@/utils/winProbability';
 import type { WinProbability } from '@/utils/winProbability';
 
@@ -107,6 +107,7 @@ export function useGameSummary(
 
   return useQuery<GameSummaryData, AppError>({
     queryKey: ['game-summary', sport, league, eventId],
+    enabled: Boolean(sport && league && eventId),
     queryFn: async () => {
       try {
         const raw = await fetchGameSummary(sport, league, eventId);
@@ -244,8 +245,28 @@ export function useGameSummary(
                 }
               }
 
-              const oversArr = (statsObj.overs ?? [[]]) as Array<Array<{ number: string; runs: string }>>;
-              const recentOvers = (oversArr[0] ?? []).slice(-6).map(o => o.runs);
+              const oversArr = (statsObj.overs ?? [[]]) as Array<Array<{ number: string; runs: string; wicket?: unknown[] }>>;
+              const rawBalls = oversArr[0] ?? [];
+
+              // ESPN `runs` is cumulative across the innings — compute per-ball delta
+              function perBallRuns(balls: typeof rawBalls): { number: string; runs: string; isWicket: boolean }[] {
+                let prevCumulative = 0;
+                return balls.map(b => {
+                  const cumulative = parseInt(b.runs, 10) || 0;
+                  const delta = Math.max(0, cumulative - prevCumulative);
+                  prevCumulative = cumulative;
+                  return {
+                    number: b.number,
+                    runs: String(delta),
+                    isWicket: Array.isArray(b.wicket) && b.wicket.length > 0,
+                  };
+                });
+              }
+
+              const allBalls = perBallRuns(rawBalls);
+              const recentOvers = allBalls.slice(-6).map(o => o.runs);
+              // Last 36 balls (~5-6 overs) for ball-by-ball display
+              const recentBalls: CricketBall[] = allBalls.slice(-36);
 
               const key = `${abbrev}-${lsAny.period}`;
               inningsMap.set(key, {
@@ -257,6 +278,7 @@ export function useGameSummary(
                 batsmen: [],
                 bowlers: [],
                 recentOvers,
+                recentBalls,
               });
             }
           }

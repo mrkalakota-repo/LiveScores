@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { AppState, AppStateStatus, Platform } from 'react-native';
+import { ActivityIndicator, AppState, AppStateStatus, Platform, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-query';
 import { LiveGamesProvider } from '@/contexts/LiveGamesContext';
 import { LiveCountPoller } from '@/components/LiveCountPoller';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { SportPreferencesProvider } from '@/contexts/SportPreferencesContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { SportPreferencesProvider, useSportPreferences } from '@/contexts/SportPreferencesContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,26 +22,41 @@ function onAppStateChange(status: AppStateStatus) {
   focusManager.setFocused(status === 'active');
 }
 
-export default function RootLayout() {
+/** Inner layout — only renders once preferences are loaded from storage. */
+function AppContent() {
+  const { ready: themeReady, C } = useTheme();
+  const { ready: prefsReady } = useSportPreferences();
+
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      // On web, TanStack Query uses window focus/blur by default
-      return;
-    }
+    if (Platform.OS === 'web') return;
     const sub = AppState.addEventListener('change', onAppStateChange);
     return () => sub.remove();
   }, []);
 
+  if (!themeReady || !prefsReady) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: C.background }}>
+        <ActivityIndicator size="large" color={C.accent} />
+      </View>
+    );
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LiveGamesProvider>
+        <LiveCountPoller />
+        <StatusBar style="light" />
+        <Stack screenOptions={{ headerShown: false }} />
+      </LiveGamesProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default function RootLayout() {
   return (
     <ThemeProvider>
       <SportPreferencesProvider>
-        <QueryClientProvider client={queryClient}>
-          <LiveGamesProvider>
-            <LiveCountPoller />
-            <StatusBar style="light" />
-            <Stack screenOptions={{ headerShown: false }} />
-          </LiveGamesProvider>
-        </QueryClientProvider>
+        <AppContent />
       </SportPreferencesProvider>
     </ThemeProvider>
   );

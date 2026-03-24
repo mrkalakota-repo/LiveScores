@@ -21,7 +21,7 @@ import { WinProbabilityBar } from '@/components/WinProbabilityBar';
 import { TennisPointBoard } from '@/components/TennisPointBoard';
 import { CricketScorecard } from '@/components/CricketScorecard';
 import { PlayerBoxScore } from '@/components/PlayerBoxScore';
-import { computeWinProbability } from '@/utils/winProbability';
+import type { AppError } from '@/api/errors';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 
 function createStyles(C: ColorScheme) {
@@ -256,10 +256,14 @@ export default function GameDetailScreen() {
     league: string;
   }>();
 
+  const safeSport = safeSport;
+  const safeLeague = league ?? '';
+  const safeId = id ?? '';
+
   const { data, isLoading, isError, error, refetch } = useGameSummary(
-    sport ?? '',
-    league ?? '',
-    id ?? '',
+    safeSport,
+    safeLeague,
+    safeId,
   );
 
   // Show interstitial ad on game detail open (throttled by cooldown)
@@ -319,7 +323,7 @@ export default function GameDetailScreen() {
         <View style={styles.center}>
           <Ionicons name="alert-circle-outline" size={44} color={C.live} />
           <Text style={styles.errorTitle}>Could not load game details</Text>
-          <Text style={styles.errorSub}>{(error as any)?.message ?? 'Please try again.'}</Text>
+          <Text style={styles.errorSub}>{(error as AppError)?.message ?? 'Please try again.'}</Text>
           <Pressable style={[styles.retryBtn, { backgroundColor: C.accent }]} onPress={handleRefetch}>
             <Text style={styles.retryText}>Retry</Text>
           </Pressable>
@@ -340,33 +344,20 @@ export default function GameDetailScreen() {
             awayTeam={data.awayTeam}
             status={data.status}
             statusText={data.statusText}
-            sport={sport ?? ''}
+            sport={safeSport}
+            cricketInnings={data.cricketInnings}
           />
 
           {/* Win probability */}
-          {(() => {
-            const wp = computeWinProbability({
-              homeScore: data.homeTeam.score,
-              awayScore: data.awayTeam.score,
-              homeRecord: data.homeTeam.record,
-              awayRecord: data.awayTeam.record,
-              homeStats: data.homeStats,
-              awayStats: data.awayStats,
-              status: data.status,
-              statusText: data.statusText,
-              sport: sport ?? '',
-            });
-            if (!wp) return null;
-            return (
-              <View style={styles.card}>
-                <WinProbabilityBar
-                  homeTeam={data.homeTeam}
-                  awayTeam={data.awayTeam}
-                  probability={wp}
-                />
-              </View>
-            );
-          })()}
+          {data.winProbability && (
+            <View style={styles.card}>
+              <WinProbabilityBar
+                homeTeam={data.homeTeam}
+                awayTeam={data.awayTeam}
+                probability={data.winProbability}
+              />
+            </View>
+          )}
 
           {/* Tennis point board — live games only */}
           {sport === 'tennis' && data.status === 'live' && (
@@ -384,7 +375,7 @@ export default function GameDetailScreen() {
           {(data.homeTeam.linescores?.length ?? 0) > 0 && (
             <View style={styles.card}>
               <LineScores
-                sport={sport ?? ''}
+                sport={safeSport}
                 homeTeam={data.homeTeam}
                 awayTeam={data.awayTeam}
               />

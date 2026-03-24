@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { TENNIS_FORMATS } from '@/constants/sports';
-import type { LeagueConfig } from '@/constants/sports';
 import { useTennisScoreboard } from '@/hooks/useTennisScoreboard';
 import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
+import { usePersistedLeague } from '@/hooks/usePersistedLeague';
 import { ScoreboardList } from '@/components/ScoreboardList';
 import { LeagueChipBar } from '@/components/LeagueChipBar';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
 
 export default function TennisScreen() {
   const { C } = useTheme();
-  const [selectedFormat, setSelectedFormat] = useState<LeagueConfig>(TENNIS_FORMATS[0]);
+  const [selectedFormat, setSelectedFormat] = usePersistedLeague('tennis', TENNIS_FORMATS, TENNIS_FORMATS[0]);
   const { data, isLoading, isError, error, isRefetching, refetch, dataUpdatedAt } =
     useTennisScoreboard(selectedFormat.league);
   const { setLiveCount } = useLiveGames();

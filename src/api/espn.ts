@@ -91,6 +91,14 @@ export async function fetchGameSummary(
   }
 
   try {
+    // Cricket uses a different ESPN subdomain
+    if (sport === 'cricket') {
+      const { data } = await espnWebClient.get<EspnSummaryResponse>(
+        `/site/v2/sports/cricket/${league}/summary`,
+        { params: { event: eventId } },
+      );
+      return data;
+    }
     const { data } = await espnClient.get<EspnSummaryResponse>(
       `/${sport}/${league}/summary`,
       { params: { event: eventId } },

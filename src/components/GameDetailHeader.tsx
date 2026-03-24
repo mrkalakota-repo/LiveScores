@@ -4,7 +4,7 @@ import { Image } from 'expo-image';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { ColorScheme } from '@/constants/themes';
 import { StatusBadge } from './StatusBadge';
-import type { GameStatus, TeamInfo } from '@/api/types';
+import type { GameStatus, TeamInfo, CricketInningsData } from '@/api/types';
 
 function createStyles(C: ColorScheme) {
   return StyleSheet.create({
@@ -153,6 +153,9 @@ function createStyles(C: ColorScheme) {
       paddingVertical: 4,
       marginBottom: 2,
     },
+    tennisHeaderLogoSpacer: {
+      width: 32,
+    },
     tennisHeaderSpacer: {
       flex: 1,
     },
@@ -220,6 +223,24 @@ function createStyles(C: ColorScheme) {
       height: StyleSheet.hairlineWidth,
       backgroundColor: C.border,
       marginVertical: 2,
+    },
+    // ── Cricket ball-by-ball ────────────────────────────────────────
+    ballByBallWrap: {
+      paddingTop: 8,
+      gap: 6,
+    },
+    ballByBallLabel: {
+      fontSize: 9,
+      fontWeight: '700',
+      letterSpacing: 0.8,
+      color: C.textMuted,
+    },
+    ballByBallText: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: C.textSecondary,
+      letterSpacing: 1,
+      lineHeight: 20,
     },
   });
 }
@@ -324,9 +345,25 @@ const TennisPlayerRow = memo(function TennisPlayerRow({ team, opponentLinescores
 interface CricketTeamRowProps {
   team: TeamInfo;
   gameStatus: GameStatus;
+  innings?: CricketInningsData;
 }
 
-const CricketTeamRow = memo(function CricketTeamRow({ team, gameStatus }: CricketTeamRowProps) {
+/** Group balls into overs by their ball number (e.g. "3.1" → over 3) */
+function groupBallsIntoOvers(balls: { number: string; runs: string; isWicket: boolean }[]) {
+  const overs: { overNum: string; balls: typeof balls }[] = [];
+  let currentOver = '';
+  for (const b of balls) {
+    const overNum = b.number.split('.')[0];
+    if (overNum !== currentOver) {
+      overs.push({ overNum, balls: [] });
+      currentOver = overNum;
+    }
+    overs[overs.length - 1].balls.push(b);
+  }
+  return overs;
+}
+
+const CricketTeamRow = memo(function CricketTeamRow({ team, gameStatus, innings }: CricketTeamRowProps) {
   const { C } = useTheme();
   const styles = useMemo(() => createStyles(C), [C]);
   const isFinal = gameStatus === 'final';
@@ -337,21 +374,49 @@ const CricketTeamRow = memo(function CricketTeamRow({ team, gameStatus }: Cricke
     : isScheduled ? C.textMuted
     : C.textPrimary;
 
+  const recentBalls = innings?.recentBalls ?? [];
+  // Group into overs, take last 5, reverse so most recent is on the left
+  const allOvers = recentBalls.length > 0 ? groupBallsIntoOvers(recentBalls) : [];
+  const last5Overs = allOvers.slice(-5).reverse();
+  // Also reverse balls within each over so most recent ball is leftmost
+  last5Overs.forEach(over => over.balls.reverse());
+
   return (
-    <View style={styles.cricketTeamRow}>
-      {team.logo ? (
-        <Image source={{ uri: team.logo }} style={styles.cricketLogo} contentFit="contain" recyclingKey={team.id} />
-      ) : (
-        <View style={styles.cricketLogoPlaceholder}>
-          <Text style={styles.cricketLogoInitial}>{team.abbreviation.charAt(0)}</Text>
+    <View>
+      <View style={styles.cricketTeamRow}>
+        {team.logo ? (
+          <Image source={{ uri: team.logo }} style={styles.cricketLogo} contentFit="contain" recyclingKey={team.id} />
+        ) : (
+          <View style={styles.cricketLogoPlaceholder}>
+            <Text style={styles.cricketLogoInitial}>{team.abbreviation.charAt(0)}</Text>
+          </View>
+        )}
+        <Text style={[styles.cricketName, { color: nameColor }]} numberOfLines={1}>
+          {team.displayName}
+        </Text>
+        <Text style={[styles.cricketScore, { color: scoreColor }]}>
+          {isScheduled ? '--' : team.score}
+        </Text>
+      </View>
+
+      {/* Ball-by-ball under the team — most recent on left, | at end of each over */}
+      {last5Overs.length > 0 && (
+        <View style={styles.ballByBallWrap}>
+          <Text style={styles.ballByBallLabel}>
+            RECENT OVERS{innings?.overs ? ` (${innings.overs} ov)` : ''}
+            {innings?.runRate ? `  RR ${innings.runRate}` : ''}
+          </Text>
+          <Text style={styles.ballByBallText}>
+            {last5Overs.map((over) =>
+              over.balls.map(b => {
+                if (b.isWicket) return 'W';
+                const n = parseInt(b.runs, 10);
+                return (n === 4 || n === 6) ? b.runs : b.runs;
+              }).join(' ')
+            ).join(' | ')}
+          </Text>
         </View>
       )}
-      <Text style={[styles.cricketName, { color: nameColor }]} numberOfLines={1}>
-        {team.displayName}
-      </Text>
-      <Text style={[styles.cricketScore, { color: scoreColor }]}>
-        {isScheduled ? '--' : team.score}
-      </Text>
     </View>
   );
 });
@@ -362,23 +427,32 @@ interface Props {
   status: GameStatus;
   statusText: string;
   sport?: string;
+  cricketInnings?: CricketInningsData[];
 }
 
-export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayTeam, status, statusText, sport }: Props) {
+export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayTeam, status, statusText, sport, cricketInnings }: Props) {
   const { C } = useTheme();
   const styles = useMemo(() => createStyles(C), [C]);
   const isTennis = sport === 'tennis';
   const isCricket = sport === 'cricket';
 
   if (isCricket) {
+    // Find the most recent innings for each team (last one with balls data)
+    const awayInnings = cricketInnings
+      ?.filter(inn => inn.teamAbbrev === awayTeam.abbreviation)
+      .pop();
+    const homeInnings = cricketInnings
+      ?.filter(inn => inn.teamAbbrev === homeTeam.abbreviation)
+      .pop();
+
     return (
       <View style={[styles.container, styles.containerCricket]}>
         <View style={styles.cricketStatusRow}>
           <StatusBadge status={status} statusText={statusText} />
         </View>
-        <CricketTeamRow team={awayTeam} gameStatus={status} />
+        <CricketTeamRow team={awayTeam} gameStatus={status} innings={awayInnings} />
         <View style={styles.cricketDivider} />
-        <CricketTeamRow team={homeTeam} gameStatus={status} />
+        <CricketTeamRow team={homeTeam} gameStatus={status} innings={homeInnings} />
       </View>
     );
   }
@@ -387,7 +461,6 @@ export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayT
     const awayLS = awayTeam.linescores ?? [];
     const homeLS = homeTeam.linescores ?? [];
     const setCount = Math.max(awayLS.length, homeLS.length);
-    const setLabels = Array.from({ length: setCount }, (_, i) => `S${i + 1}`);
 
     return (
       <View style={[styles.container, styles.tennisContainer]}>
@@ -398,11 +471,10 @@ export const GameDetailHeader = memo(function GameDetailHeader({ homeTeam, awayT
         {/* Column headers: spacer + S1 S2 S3 ... + SETS */}
         {setCount > 0 && status !== 'scheduled' && (
           <View style={styles.tennisHeaderRow}>
-            {/* Logo + name spacer */}
-            <View style={{ width: 32 }} />
+            <View style={styles.tennisHeaderLogoSpacer} />
             <View style={styles.tennisHeaderSpacer} />
-            {setLabels.map(lbl => (
-              <Text key={lbl} style={[styles.tennisHeaderLabel, { color: C.textMuted }]}>{lbl}</Text>
+            {Array.from({ length: setCount }, (_, i) => (
+              <Text key={i} style={[styles.tennisHeaderLabel, { color: C.textMuted }]}>S{i + 1}</Text>
             ))}
             <Text style={[styles.tennisHeaderTotal, { color: C.textMuted }]}>SETS</Text>
           </View>

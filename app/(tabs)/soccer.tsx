@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
-import { SOCCER_LEAGUES, type SoccerLeague } from '@/constants/sports';
+import { SOCCER_LEAGUES } from '@/constants/sports';
 import { useScoreboard } from '@/hooks/useScoreboard';
 import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
+import { usePersistedLeague } from '@/hooks/usePersistedLeague';
 import { ScoreboardList } from '@/components/ScoreboardList';
 import { LeagueChipBar } from '@/components/LeagueChipBar';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
 
 export default function SoccerScreen() {
   const { C } = useTheme();
-  const [selectedLeague, setSelectedLeague] = useState<SoccerLeague>(SOCCER_LEAGUES[0]);
+  const [selectedLeague, setSelectedLeague] = usePersistedLeague('soccer', SOCCER_LEAGUES, SOCCER_LEAGUES[0]);
   const { data, isLoading, isError, error, isRefetching, refetch, dataUpdatedAt } =
     useScoreboard(selectedLeague.sport, selectedLeague.league);
   const { setLiveCount } = useLiveGames();
