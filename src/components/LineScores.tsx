@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { TeamInfo } from '@/api/types';
 
 interface Props {
@@ -36,6 +37,7 @@ function periodLabels(sport: string, count: number): string[] {
 
 export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }: Props) {
   const { C } = useTheme();
+  const { scale } = useResponsive();
   const awayLS = awayTeam.linescores ?? [];
   const homeLS = homeTeam.linescores ?? [];
   const periodCount = Math.max(awayLS.length, homeLS.length);
@@ -47,8 +49,8 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
   const labels = periodLabels(sport, periodCount);
   const totalLabel = isTennis ? 'SETS' : 'T';
   const sectionLabel = isTennis ? 'SET SCORES' : isCricket ? 'INNINGS' : 'LINE SCORE';
-  const colWidth = isCricket ? 64 : COL_W;
-  const teamWidth = isCricket ? 56 : TEAM_W;
+  const colWidth = isCricket ? scale(64) : scale(COL_W);
+  const teamWidth = isCricket ? scale(56) : scale(TEAM_W);
 
   return (
     <View style={styles.wrapper}>

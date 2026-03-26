@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { GameStatus, TeamInfo } from '@/api/types';
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 
 export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus, opponentLinescores, isTennis }: Props) {
   const { C } = useTheme();
+  const { scale } = useResponsive();
   const isFinal = gameStatus === 'final';
   const isScheduled = gameStatus === 'scheduled';
 
@@ -29,26 +31,28 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus, oppon
 
   const showTennisSets = isTennis && !isScheduled && team.linescores && team.linescores.length > 0;
 
+  const logoSize = scale(38);
+
   return (
     <View style={styles.row}>
       {team.logo ? (
         <Image
           source={{ uri: team.logo }}
-          style={styles.logo}
+          style={{ width: logoSize, height: logoSize }}
           contentFit="contain"
           transition={200}
           recyclingKey={team.id}
         />
       ) : (
-        <View style={[styles.logoPlaceholder, { backgroundColor: C.surfaceElevated }]}>
-          <Text style={[styles.logoInitial, { color: C.textMuted }]}>{team.abbreviation.charAt(0)}</Text>
+        <View style={[styles.logoPlaceholder, { backgroundColor: C.surfaceElevated, width: logoSize, height: logoSize, borderRadius: logoSize / 2 }]}>
+          <Text style={[styles.logoInitial, { color: C.textMuted }]} maxFontSizeMultiplier={1.3}>{team.abbreviation.charAt(0)}</Text>
         </View>
       )}
-      <Text style={[styles.abbrev, { color: nameColor }]} numberOfLines={1}>
+      <Text style={[styles.abbrev, { color: nameColor }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
         {team.abbreviation}
       </Text>
       {team.record && (
-        <Text style={[styles.record, { color: C.textMuted }]} numberOfLines={1}>
+        <Text style={[styles.record, { color: C.textMuted }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
           {team.record}
         </Text>
       )}
@@ -71,7 +75,7 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus, oppon
                   styles.setCellText,
                   { color: C.textSecondary },
                   wonSet && { color: C.accent, fontWeight: '900' },
-                ]}>
+                ]} maxFontSizeMultiplier={1.3}>
                   {games}
                 </Text>
               </View>
@@ -79,7 +83,7 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus, oppon
           })}
         </View>
       ) : (
-        <Text style={[styles.score, { color: scoreColor }]}>
+        <Text style={[styles.score, { color: scoreColor }]} maxFontSizeMultiplier={1.3}>
           {isScheduled ? '--' : team.score}
         </Text>
       )}

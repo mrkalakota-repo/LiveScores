@@ -12,7 +12,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { ColorScheme } from '@/constants/themes';
 import { useGameSummary } from '@/hooks/useGameSummary';
 import { GameDetailHeader } from '@/components/GameDetailHeader';
@@ -31,7 +33,7 @@ function createStyles(C: ColorScheme) {
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: 16,
-      paddingTop: 56,
+      paddingTop: 12,
       paddingBottom: 12,
       backgroundColor: C.background,
       borderBottomWidth: StyleSheet.hairlineWidth,
@@ -247,6 +249,8 @@ function createStyles(C: ColorScheme) {
 
 export default function GameDetailScreen() {
   const { C } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { isTablet, maxContentWidth } = useResponsive();
   const styles = useMemo(() => createStyles(C), [C]);
   const [showMiniHeader, setShowMiniHeader] = useState(false);
   const router = useRouter();
@@ -284,7 +288,7 @@ export default function GameDetailScreen() {
   return (
     <View style={styles.screen}>
       {/* Custom back header */}
-      <View style={styles.navBar}>
+      <View style={[styles.navBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={handleBack} style={styles.backBtn} hitSlop={12}>
           <Ionicons name="chevron-back" size={22} color={C.textPrimary} />
           <Text style={styles.backLabel}>Scores</Text>
@@ -333,7 +337,10 @@ export default function GameDetailScreen() {
       {data && !isLoading && (
         <ScrollView
           style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            isTablet && { maxWidth: maxContentWidth, alignSelf: 'center' as const, width: '100%' as const },
+          ]}
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}

@@ -1,6 +1,7 @@
 import React, { memo, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { ColorScheme } from '@/constants/themes';
 import type { TeamBoxScore } from '@/api/types';
 
@@ -130,6 +131,8 @@ interface CategoryTableProps {
 }
 
 const CategoryTable = memo(function CategoryTable({ cat, styles, C }: CategoryTableProps) {
+  const { scale } = useResponsive();
+  const nameColWidth = scale(120);
   const colW = Math.max(38, Math.min(52, 240 / Math.max(cat.labels.length, 1)));
   return (
     <View>
@@ -141,7 +144,7 @@ const CategoryTable = memo(function CategoryTable({ cat, styles, C }: CategoryTa
         <View>
           {/* Column headers */}
           <View style={styles.tableHeader}>
-            <View style={styles.nameColHeader}>
+            <View style={[styles.nameColHeader, { width: nameColWidth }]}>
               <Text style={styles.headerLabel}>PLAYER</Text>
             </View>
             {cat.labels.map(lbl => (
@@ -160,7 +163,7 @@ const CategoryTable = memo(function CategoryTable({ cat, styles, C }: CategoryTa
               key={player.id + pi}
               style={[styles.playerRow, pi % 2 === 1 && styles.playerRowAlt]}
             >
-              <View style={styles.nameCol}>
+              <View style={[styles.nameCol, { width: nameColWidth }]}>
                 {player.jersey && (
                   <Text style={styles.playerJersey}>#{player.jersey}</Text>
                 )}

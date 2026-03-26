@@ -20,7 +20,7 @@ export function LastUpdatedBar({ updatedAt }: Props) {
   return (
     <View style={styles.bar}>
       <Ionicons name="time-outline" size={12} color={C.textMuted} />
-      <Text style={[styles.text, { color: C.textMuted }]}>Updated {formatLastUpdated(updatedAt)}</Text>
+      <Text style={[styles.text, { color: C.textMuted }]} maxFontSizeMultiplier={1.3}>Updated {formatLastUpdated(updatedAt)}</Text>
     </View>
   );
 }

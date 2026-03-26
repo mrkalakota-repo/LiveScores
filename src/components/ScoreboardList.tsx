@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
-import { Platform, RefreshControl, SectionList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Platform, RefreshControl, SectionList, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/colors';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import { groupGamesIntoSections } from '@/utils/transformers';
 import { GameCard } from './GameCard';
 import { LoadingScreen } from './LoadingScreen';
@@ -36,6 +37,7 @@ export function ScoreboardList({
   sport,
 }: Props) {
   const { C } = useTheme();
+  const { columns, isTablet, maxContentWidth } = useResponsive();
   const sections = useMemo(() => groupGamesIntoSections(games), [games]);
 
   const renderItem = useCallback(
@@ -47,7 +49,7 @@ export function ScoreboardList({
     ({ section }: { section: { title: string } }) => (
       <View style={styles.sectionHeader}>
         <View style={[styles.sectionDot, { backgroundColor: C.accent }]} />
-        <Text style={[styles.sectionTitle, { color: C.accent }]}>{section.title}</Text>
+        <Text style={[styles.sectionTitle, { color: C.accent }]} maxFontSizeMultiplier={1.3}>{section.title}</Text>
         <View style={[styles.sectionLine, { backgroundColor: C.accent }]} />
       </View>
     ),
@@ -64,6 +66,41 @@ export function ScoreboardList({
   }
   if (games.length === 0) return <EmptyState sport={sport} />;
 
+  // Multi-column grid on tablets — use FlatList instead of SectionList
+  if (columns > 1) {
+    const flatData = sections.flatMap(s => s.data);
+    return (
+      <View style={styles.flex}>
+        {updatedAt > 0 && <LastUpdatedBar updatedAt={updatedAt} />}
+        <FlatList
+          style={styles.flex}
+          data={flatData}
+          keyExtractor={item => item.id}
+          numColumns={columns}
+          renderItem={renderItem}
+          columnWrapperStyle={[styles.columnWrapper, { maxWidth: maxContentWidth, alignSelf: 'center' as const }]}
+          ListFooterComponent={
+            <View style={styles.footer}>
+              <AdBanner />
+            </View>
+          }
+          contentContainerStyle={styles.content}
+          removeClippedSubviews
+          refreshControl={
+            Platform.OS !== 'web' ? (
+              <RefreshControl
+                refreshing={isRefetching}
+                onRefresh={onRefresh}
+                tintColor={C.scheduled}
+                colors={[C.scheduled]}
+              />
+            ) : undefined
+          }
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.flex}>
       {updatedAt > 0 && <LastUpdatedBar updatedAt={updatedAt} />}
@@ -78,7 +115,10 @@ export function ScoreboardList({
             <AdBanner />
           </View>
         }
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          isTablet && { maxWidth: maxContentWidth, alignSelf: 'center' as const, width: '100%' as const },
+        ]}
         stickySectionHeadersEnabled={false}
         removeClippedSubviews
         refreshControl={
@@ -102,6 +142,9 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 20,
+  },
+  columnWrapper: {
+    width: '100%',
   },
   sectionHeader: {
     flexDirection: 'row',

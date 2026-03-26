@@ -38,7 +38,7 @@ export const StatusBadge = memo(function StatusBadge({ status, statusText }: Pro
       {status === 'live' && dot && (
         <Animated.View style={[styles.dot, { backgroundColor: dot, opacity }]} />
       )}
-      <Text style={[styles.text, { color: text }]} numberOfLines={1}>
+      <Text style={[styles.text, { color: text }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
         {statusText}
       </Text>
     </View>

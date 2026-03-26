@@ -3,6 +3,7 @@ import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-nat
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { ColorScheme } from '@/constants/themes';
 
 /**
@@ -86,6 +87,19 @@ function createStyles(C: ColorScheme) {
       fontStyle: 'italic',
       lineHeight: 17,
     },
+    tennisSetHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: -2,
+      gap: 4,
+    },
+    tennisSetLabel: {
+      width: 28,
+      textAlign: 'center',
+      fontSize: 9,
+      fontWeight: '700',
+      letterSpacing: 0.3,
+    },
     tennisPoint: {
       fontSize: 14,
       fontWeight: '900',
@@ -142,6 +156,7 @@ function createStyles(C: ColorScheme) {
 
 export const GameCard = memo(function GameCard({ game }: Props) {
   const { C } = useTheme();
+  const { columns } = useResponsive();
   const styles = useMemo(() => createStyles(C), [C]);
   const router = useRouter();
   const accentColor = { live: C.live, halftime: C.halftime, scheduled: C.accent, final: C.border }[game.status] ?? C.border;
@@ -167,7 +182,7 @@ export const GameCard = memo(function GameCard({ game }: Props) {
   }, [router, game.id, game.sport, game.league]);
 
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, columns > 1 && { flex: 1 }]}>
     <Pressable
       style={[
         styles.card,
@@ -189,11 +204,26 @@ export const GameCard = memo(function GameCard({ game }: Props) {
         <View style={styles.header}>
           <StatusBadge status={game.status} statusText={game.statusText} />
           {game.broadcasts.length > 0 && (
-            <Text style={styles.broadcast} numberOfLines={1}>
+            <Text style={styles.broadcast} numberOfLines={1} maxFontSizeMultiplier={1.3}>
               {game.broadcasts[0]}
             </Text>
           )}
         </View>
+
+        {/* Tennis set headers */}
+        {game.sport === 'tennis' && game.status !== 'scheduled' && (game.awayTeam.linescores?.length || game.homeTeam.linescores?.length) ? (
+          <View style={styles.tennisSetHeader}>
+            <View style={{ flex: 1 }} />
+            {Array.from(
+              { length: Math.max(game.awayTeam.linescores?.length ?? 0, game.homeTeam.linescores?.length ?? 0) },
+              (_, i) => (
+                <Text key={i} style={[styles.tennisSetLabel, { color: C.textMuted }]}>
+                  S{i + 1}
+                </Text>
+              ),
+            )}
+          </View>
+        ) : null}
 
         {/* Teams */}
         <TeamRow

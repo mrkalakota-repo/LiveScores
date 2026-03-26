@@ -1,6 +1,7 @@
 import React, { memo, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { ColorScheme } from '@/constants/themes';
 import type { CricketInningsData } from '@/api/types';
 
@@ -179,7 +180,10 @@ interface Props {
 
 export const CricketScorecard = memo(function CricketScorecard({ innings }: Props) {
   const { C } = useTheme();
+  const { scale } = useResponsive();
   const styles = useMemo(() => createStyles(C), [C]);
+  const batColW = scale(36);
+  const bowlColW = scale(40);
 
   return (
     <View style={styles.wrapper}>
@@ -218,11 +222,11 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
                 <View>
                   <View style={styles.tableHeader}>
                     <Text style={[styles.batName, { color: C.textMuted, fontSize: 10, fontWeight: '700' }]}>Batter</Text>
-                    <Text style={styles.batColHeader}>R</Text>
-                    <Text style={styles.batColHeader}>B</Text>
-                    <Text style={styles.batColHeader}>4s</Text>
-                    <Text style={styles.batColHeader}>6s</Text>
-                    <Text style={styles.batColHeader}>SR</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]}>R</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]}>B</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]}>4s</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]}>6s</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]}>SR</Text>
                   </View>
                   {inn.batsmen.map((bat, bi) => (
                     <View
@@ -240,11 +244,11 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
                           <Text style={styles.batDismissal} numberOfLines={1}>{bat.dismissal}</Text>
                         ) : null}
                       </View>
-                      <Text style={[styles.batCol, styles.batRuns]}>{bat.runs}</Text>
-                      <Text style={styles.batCol}>{bat.balls}</Text>
-                      <Text style={styles.batCol}>{bat.fours}</Text>
-                      <Text style={styles.batCol}>{bat.sixes}</Text>
-                      <Text style={styles.batCol}>{bat.strikeRate || '-'}</Text>
+                      <Text style={[styles.batCol, styles.batRuns, { width: batColW }]}>{bat.runs}</Text>
+                      <Text style={[styles.batCol, { width: batColW }]}>{bat.balls}</Text>
+                      <Text style={[styles.batCol, { width: batColW }]}>{bat.fours}</Text>
+                      <Text style={[styles.batCol, { width: batColW }]}>{bat.sixes}</Text>
+                      <Text style={[styles.batCol, { width: batColW }]}>{bat.strikeRate || '-'}</Text>
                     </View>
                   ))}
                 </View>
@@ -260,11 +264,11 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
                 <View>
                   <View style={styles.tableHeader}>
                     <Text style={[styles.bowlName, { color: C.textMuted, fontSize: 10, fontWeight: '700' }]}>Bowler</Text>
-                    <Text style={styles.bowlColHeader}>O</Text>
-                    <Text style={styles.bowlColHeader}>M</Text>
-                    <Text style={styles.bowlColHeader}>R</Text>
-                    <Text style={styles.bowlColHeader}>W</Text>
-                    <Text style={styles.bowlColHeader}>Econ</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>O</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>M</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>R</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>W</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>Econ</Text>
                   </View>
                   {inn.bowlers.map((bowl, bi) => (
                     <View
@@ -272,11 +276,11 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
                       style={[styles.tableRow, bi === inn.bowlers.length - 1 && styles.tableRowLast]}
                     >
                       <Text style={styles.bowlName} numberOfLines={1}>{bowl.name}</Text>
-                      <Text style={styles.bowlCol}>{bowl.overs}</Text>
-                      <Text style={styles.bowlCol}>{bowl.maidens}</Text>
-                      <Text style={styles.bowlCol}>{bowl.runs}</Text>
-                      <Text style={[styles.bowlCol, styles.bowlWickets]}>{bowl.wickets}</Text>
-                      <Text style={styles.bowlCol}>{bowl.economy || '-'}</Text>
+                      <Text style={[styles.bowlCol, { width: bowlColW }]}>{bowl.overs}</Text>
+                      <Text style={[styles.bowlCol, { width: bowlColW }]}>{bowl.maidens}</Text>
+                      <Text style={[styles.bowlCol, { width: bowlColW }]}>{bowl.runs}</Text>
+                      <Text style={[styles.bowlCol, styles.bowlWickets, { width: bowlColW }]}>{bowl.wickets}</Text>
+                      <Text style={[styles.bowlCol, { width: bowlColW }]}>{bowl.economy || '-'}</Text>
                     </View>
                   ))}
                 </View>
