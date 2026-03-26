@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useResponsive } from '@/hooks/useResponsive';
 import type { GameStatus, TeamInfo } from '@/api/types';
 
 interface Props {
@@ -16,7 +15,6 @@ interface Props {
 
 export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus, opponentLinescores, isTennis }: Props) {
   const { C } = useTheme();
-  const { scale } = useResponsive();
   const isFinal = gameStatus === 'final';
   const isScheduled = gameStatus === 'scheduled';
 
@@ -31,20 +29,18 @@ export const TeamRow = memo(function TeamRow({ team, isWinner, gameStatus, oppon
 
   const showTennisSets = isTennis && !isScheduled && team.linescores && team.linescores.length > 0;
 
-  const logoSize = scale(38);
-
   return (
     <View style={styles.row}>
       {team.logo ? (
         <Image
           source={{ uri: team.logo }}
-          style={{ width: logoSize, height: logoSize }}
+          style={styles.logo}
           contentFit="contain"
           transition={200}
           recyclingKey={team.id}
         />
       ) : (
-        <View style={[styles.logoPlaceholder, { backgroundColor: C.surfaceElevated, width: logoSize, height: logoSize, borderRadius: logoSize / 2 }]}>
+        <View style={[styles.logoPlaceholder, { backgroundColor: C.surfaceElevated }]}>
           <Text style={[styles.logoInitial, { color: C.textMuted }]} maxFontSizeMultiplier={1.3}>{team.abbreviation.charAt(0)}</Text>
         </View>
       )}

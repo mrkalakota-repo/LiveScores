@@ -2,7 +2,6 @@ import React, { memo, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useResponsive } from '@/hooks/useResponsive';
 import type { ColorScheme } from '@/constants/themes';
 import { StatusBadge } from './StatusBadge';
 import type { GameStatus, TeamInfo, CricketInningsData } from '@/api/types';
@@ -254,7 +253,6 @@ interface TeamColProps {
 
 const TeamCol = memo(function TeamCol({ team, gameStatus, align }: TeamColProps) {
   const { C } = useTheme();
-  const { scale } = useResponsive();
   const styles = useMemo(() => createStyles(C), [C]);
   const isFinal = gameStatus === 'final';
   const isScheduled = gameStatus === 'scheduled';
@@ -264,20 +262,18 @@ const TeamCol = memo(function TeamCol({ team, gameStatus, align }: TeamColProps)
     : isScheduled ? C.textMuted
     : C.textPrimary;
 
-  const logoSize = scale(76);
-
   return (
     <View style={[styles.teamCol, align === 'right' && styles.teamColRight]}>
       {team.logo ? (
-        <Image source={{ uri: team.logo }} style={{ width: logoSize, height: logoSize }} contentFit="contain" recyclingKey={team.id} />
+        <Image source={{ uri: team.logo }} style={styles.logo} contentFit="contain" recyclingKey={team.id} />
       ) : (
-        <View style={[styles.logoPlaceholder, { width: logoSize, height: logoSize, borderRadius: logoSize / 2 }]}>
+        <View style={styles.logoPlaceholder}>
           <Text style={styles.logoInitial} maxFontSizeMultiplier={1.3}>{team.abbreviation.charAt(0)}</Text>
         </View>
       )}
       <Text style={[styles.abbrev, { color: nameColor }]} maxFontSizeMultiplier={1.3}>{team.abbreviation}</Text>
       {team.record && <Text style={[styles.record, { color: C.textMuted }]} maxFontSizeMultiplier={1.3}>{team.record}</Text>}
-      <Text style={[styles.score, { color: scoreColor, fontSize: scale(64) }]} maxFontSizeMultiplier={1.3}>
+      <Text style={[styles.score, { color: scoreColor }]} maxFontSizeMultiplier={1.3}>
         {isScheduled ? '--' : team.score}
       </Text>
     </View>
