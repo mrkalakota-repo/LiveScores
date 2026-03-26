@@ -37,12 +37,22 @@ export function ScoreboardList({
   sport,
 }: Props) {
   const { C } = useTheme();
-  const { columns, isTablet, maxContentWidth } = useResponsive();
+  const { columns, isTablet, maxContentWidth, cardColumnWidth } = useResponsive();
   const sections = useMemo(() => groupGamesIntoSections(games), [games]);
 
   const renderItem = useCallback(
     ({ item }: { item: GameData }) => <GameCard game={item} />,
     [],
+  );
+
+  // On tablets, render each game at a fixed column width so they wrap into a grid
+  const renderGridItem = useCallback(
+    ({ item }: { item: GameData }) => (
+      <View style={{ width: cardColumnWidth }}>
+        <GameCard game={item} />
+      </View>
+    ),
+    [cardColumnWidth],
   );
 
   const renderSectionHeader = useCallback(
@@ -66,25 +76,25 @@ export function ScoreboardList({
   }
   if (games.length === 0) return <EmptyState sport={sport} />;
 
-  // Multi-column grid on tablets — use FlatList instead of SectionList
+  // Multi-column grid on tablets — use FlatList with numColumns
   if (columns > 1) {
     const flatData = sections.flatMap(s => s.data);
     return (
       <View style={styles.flex}>
         {updatedAt > 0 && <LastUpdatedBar updatedAt={updatedAt} />}
         <FlatList
+          key={`grid-${columns}`}
           style={styles.flex}
           data={flatData}
           keyExtractor={item => item.id}
           numColumns={columns}
-          renderItem={renderItem}
-          columnWrapperStyle={[styles.columnWrapper, { maxWidth: maxContentWidth, alignSelf: 'center' as const }]}
+          renderItem={renderGridItem}
           ListFooterComponent={
             <View style={styles.footer}>
               <AdBanner />
             </View>
           }
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, styles.gridContent]}
           removeClippedSubviews
           refreshControl={
             Platform.OS !== 'web' ? (
@@ -115,10 +125,7 @@ export function ScoreboardList({
             <AdBanner />
           </View>
         }
-        contentContainerStyle={[
-          styles.content,
-          isTablet && { maxWidth: maxContentWidth, alignSelf: 'center' as const, width: '100%' as const },
-        ]}
+        contentContainerStyle={styles.content}
         stickySectionHeadersEnabled={false}
         removeClippedSubviews
         refreshControl={
@@ -143,8 +150,9 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 20,
   },
-  columnWrapper: {
-    width: '100%',
+  gridContent: {
+    paddingHorizontal: 8,
+    paddingBottom: 20,
   },
   sectionHeader: {
     flexDirection: 'row',

@@ -3,7 +3,6 @@ import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-nat
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useResponsive } from '@/hooks/useResponsive';
 import type { ColorScheme } from '@/constants/themes';
 
 /**
@@ -156,7 +155,6 @@ function createStyles(C: ColorScheme) {
 
 export const GameCard = memo(function GameCard({ game }: Props) {
   const { C } = useTheme();
-  const { columns } = useResponsive();
   const styles = useMemo(() => createStyles(C), [C]);
   const router = useRouter();
   const accentColor = { live: C.live, halftime: C.halftime, scheduled: C.accent, final: C.border }[game.status] ?? C.border;
@@ -182,7 +180,7 @@ export const GameCard = memo(function GameCard({ game }: Props) {
   }, [router, game.id, game.sport, game.league]);
 
   return (
-    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, columns > 1 && { flex: 1 }]}>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
     <Pressable
       style={[
         styles.card,
