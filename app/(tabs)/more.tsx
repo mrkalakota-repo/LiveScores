@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSportPreferences } from '@/contexts/SportPreferencesContext';
 import { useLiveGames } from '@/contexts/LiveGamesContext';
+import { SwipeableTab } from '@/components/SwipeableTab';
 import { SPORTS } from '@/constants/sports';
 import type { ColorScheme } from '@/constants/themes';
 
@@ -105,6 +106,7 @@ export default function MoreScreen() {
   const hiddenSports = SPORTS.filter(s => !isSelected(s.id));
 
   return (
+    <SwipeableTab>
     <View style={styles.screen}>
       <Text style={styles.heading}>MORE SPORTS</Text>
       <View style={styles.list}>
@@ -114,7 +116,7 @@ export default function MoreScreen() {
             <Pressable
               key={sport.id}
               style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-              onPress={() => router.navigate(`/(tabs)/${sport.id}` as any)}
+              onPress={() => router.navigate(`/(tabs)/${sport.id}` as Href)}
               accessibilityRole="button"
               accessibilityLabel={`Go to ${sport.label}`}
             >
@@ -157,5 +159,6 @@ export default function MoreScreen() {
         <Text style={[styles.editBtnText, { color: C.accent }]}>Customize sports in Settings</Text>
       </Pressable>
     </View>
+    </SwipeableTab>
   );
 }

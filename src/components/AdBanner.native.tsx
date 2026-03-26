@@ -1,7 +1,17 @@
 import React, { memo, useCallback, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { AD_UNIT_IDS } from '@/constants/ads';
+
+let BannerAd: any = null;
+let BannerAdSize: any = null;
+
+try {
+  const ads = require('react-native-google-mobile-ads');
+  BannerAd = ads.BannerAd;
+  BannerAdSize = ads.BannerAdSize;
+} catch {
+  // Native module not available (e.g. Expo Go)
+}
 
 const MAX_RETRIES = 3;
 
@@ -10,12 +20,12 @@ export const AdBanner = memo(function AdBanner() {
   const [retries, setRetries] = useState(0);
 
   const handleError = useCallback((err: Error) => {
-    console.warn('[AdBanner] Failed to load:', err?.message);
+    if (__DEV__) console.warn('[AdBanner] Failed to load:', err?.message);
     setRetries(prev => prev + 1);
   }, []);
 
-  // Ads not supported on web; give up after MAX_RETRIES
-  if (Platform.OS === 'web' || retries >= MAX_RETRIES) return null;
+  // No native module, web, or too many retries → render nothing
+  if (!BannerAd || Platform.OS === 'web' || retries >= MAX_RETRIES) return null;
 
   return (
     <View style={styles.container}>
