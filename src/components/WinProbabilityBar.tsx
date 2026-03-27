@@ -107,21 +107,21 @@ export const WinProbabilityBar = memo(function WinProbabilityBar({
       {/* Team labels + percentages */}
       <View style={styles.header}>
         <View style={styles.teamSide}>
-          <Text style={[styles.pct, awayLeading && styles.pctLeading]}>
+          <Text style={[styles.pct, awayLeading && styles.pctLeading]} maxFontSizeMultiplier={1.3}>
             {probability.away}%
           </Text>
-          <Text style={[styles.abbrev, awayLeading && styles.abbrevLeading]}>
+          <Text style={[styles.abbrev, awayLeading && styles.abbrevLeading]} maxFontSizeMultiplier={1.3}>
             {awayTeam.abbreviation}
           </Text>
         </View>
 
-        <Text style={styles.centerLabel}>WIN PROBABILITY</Text>
+        <Text style={styles.centerLabel} maxFontSizeMultiplier={1.3}>WIN PROBABILITY</Text>
 
         <View style={[styles.teamSide, styles.teamSideRight]}>
-          <Text style={[styles.abbrev, homeLeading && styles.abbrevLeading]}>
+          <Text style={[styles.abbrev, homeLeading && styles.abbrevLeading]} maxFontSizeMultiplier={1.3}>
             {homeTeam.abbreviation}
           </Text>
-          <Text style={[styles.pct, homeLeading && styles.pctLeading]}>
+          <Text style={[styles.pct, homeLeading && styles.pctLeading]} maxFontSizeMultiplier={1.3}>
             {probability.home}%
           </Text>
         </View>
@@ -150,7 +150,7 @@ export const WinProbabilityBar = memo(function WinProbabilityBar({
 
       {/* Basis label */}
       {BASIS_LABEL[probability.basis] ? (
-        <Text style={styles.basis}>{BASIS_LABEL[probability.basis]}</Text>
+        <Text style={styles.basis} maxFontSizeMultiplier={1.3}>{BASIS_LABEL[probability.basis]}</Text>
       ) : null}
     </View>
   );

@@ -46,13 +46,14 @@ export function ScoreboardList({
   );
 
   // On tablets, render each game at a fixed column width so they wrap into a grid
+  const gridItemStyle = useMemo(() => ({ width: cardColumnWidth }), [cardColumnWidth]);
   const renderGridItem = useCallback(
     ({ item }: { item: GameData }) => (
-      <View style={{ width: cardColumnWidth }}>
+      <View style={gridItemStyle}>
         <GameCard game={item} />
       </View>
     ),
-    [cardColumnWidth],
+    [gridItemStyle],
   );
 
   const renderSectionHeader = useCallback(

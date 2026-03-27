@@ -191,24 +191,24 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
         <View key={`${inn.teamAbbrev}-${idx}`} style={styles.inningsCard}>
           {/* Innings header */}
           <View style={styles.inningsHeader}>
-            <Text style={styles.inningsTeam}>{inn.teamAbbrev}</Text>
-            <Text style={styles.inningsScore}>{inn.score}</Text>
+            <Text style={styles.inningsTeam} maxFontSizeMultiplier={1.3}>{inn.teamAbbrev}</Text>
+            <Text style={styles.inningsScore} maxFontSizeMultiplier={1.3}>{inn.score}</Text>
           </View>
 
           {/* Meta: overs, run rate, extras */}
           <View style={styles.inningsMeta}>
             {inn.overs ? (
-              <Text style={styles.metaItem}>
+              <Text style={styles.metaItem} maxFontSizeMultiplier={1.3}>
                 Overs: <Text style={styles.metaValue}>{inn.overs}</Text>
               </Text>
             ) : null}
             {inn.runRate ? (
-              <Text style={styles.metaItem}>
+              <Text style={styles.metaItem} maxFontSizeMultiplier={1.3}>
                 RR: <Text style={styles.metaValue}>{inn.runRate}</Text>
               </Text>
             ) : null}
             {inn.extras ? (
-              <Text style={styles.metaItem}>
+              <Text style={styles.metaItem} maxFontSizeMultiplier={1.3}>
                 Extras: <Text style={styles.metaValue}>{inn.extras}</Text>
               </Text>
             ) : null}
@@ -217,16 +217,16 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
           {/* Batting scorecard */}
           {inn.batsmen.length > 0 && (
             <View>
-              <Text style={styles.subLabel}>BATTING</Text>
+              <Text style={styles.subLabel} maxFontSizeMultiplier={1.3}>BATTING</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View>
                   <View style={styles.tableHeader}>
-                    <Text style={[styles.batName, { color: C.textMuted, fontSize: 10, fontWeight: '700' }]}>Batter</Text>
-                    <Text style={[styles.batColHeader, { width: batColW }]}>R</Text>
-                    <Text style={[styles.batColHeader, { width: batColW }]}>B</Text>
-                    <Text style={[styles.batColHeader, { width: batColW }]}>4s</Text>
-                    <Text style={[styles.batColHeader, { width: batColW }]}>6s</Text>
-                    <Text style={[styles.batColHeader, { width: batColW }]}>SR</Text>
+                    <Text style={[styles.batName, { color: C.textMuted, fontSize: 10, fontWeight: '700' }]} maxFontSizeMultiplier={1.3}>Batter</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]} maxFontSizeMultiplier={1.3}>R</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]} maxFontSizeMultiplier={1.3}>B</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]} maxFontSizeMultiplier={1.3}>4s</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]} maxFontSizeMultiplier={1.3}>6s</Text>
+                    <Text style={[styles.batColHeader, { width: batColW }]} maxFontSizeMultiplier={1.3}>SR</Text>
                   </View>
                   {inn.batsmen.map((bat, bi) => (
                     <View
@@ -237,18 +237,19 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
                         <Text
                           style={[styles.batName, bat.isBatting && styles.batNameBatting]}
                           numberOfLines={1}
+                          maxFontSizeMultiplier={1.3}
                         >
                           {bat.name}{bat.isBatting ? ' *' : ''}
                         </Text>
                         {bat.dismissal ? (
-                          <Text style={styles.batDismissal} numberOfLines={1}>{bat.dismissal}</Text>
+                          <Text style={styles.batDismissal} numberOfLines={1} maxFontSizeMultiplier={1.3}>{bat.dismissal}</Text>
                         ) : null}
                       </View>
-                      <Text style={[styles.batCol, styles.batRuns, { width: batColW }]}>{bat.runs}</Text>
-                      <Text style={[styles.batCol, { width: batColW }]}>{bat.balls}</Text>
-                      <Text style={[styles.batCol, { width: batColW }]}>{bat.fours}</Text>
-                      <Text style={[styles.batCol, { width: batColW }]}>{bat.sixes}</Text>
-                      <Text style={[styles.batCol, { width: batColW }]}>{bat.strikeRate || '-'}</Text>
+                      <Text style={[styles.batCol, styles.batRuns, { width: batColW }]} maxFontSizeMultiplier={1.3}>{bat.runs}</Text>
+                      <Text style={[styles.batCol, { width: batColW }]} maxFontSizeMultiplier={1.3}>{bat.balls}</Text>
+                      <Text style={[styles.batCol, { width: batColW }]} maxFontSizeMultiplier={1.3}>{bat.fours}</Text>
+                      <Text style={[styles.batCol, { width: batColW }]} maxFontSizeMultiplier={1.3}>{bat.sixes}</Text>
+                      <Text style={[styles.batCol, { width: batColW }]} maxFontSizeMultiplier={1.3}>{bat.strikeRate || '-'}</Text>
                     </View>
                   ))}
                 </View>
@@ -259,28 +260,28 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
           {/* Bowling scorecard */}
           {inn.bowlers.length > 0 && (
             <View>
-              <Text style={styles.subLabel}>BOWLING</Text>
+              <Text style={styles.subLabel} maxFontSizeMultiplier={1.3}>BOWLING</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View>
                   <View style={styles.tableHeader}>
-                    <Text style={[styles.bowlName, { color: C.textMuted, fontSize: 10, fontWeight: '700' }]}>Bowler</Text>
-                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>O</Text>
-                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>M</Text>
-                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>R</Text>
-                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>W</Text>
-                    <Text style={[styles.bowlColHeader, { width: bowlColW }]}>Econ</Text>
+                    <Text style={[styles.bowlName, { color: C.textMuted, fontSize: 10, fontWeight: '700' }]} maxFontSizeMultiplier={1.3}>Bowler</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>O</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>M</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>R</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>W</Text>
+                    <Text style={[styles.bowlColHeader, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>Econ</Text>
                   </View>
                   {inn.bowlers.map((bowl, bi) => (
                     <View
                       key={`${bowl.name}-${bi}`}
                       style={[styles.tableRow, bi === inn.bowlers.length - 1 && styles.tableRowLast]}
                     >
-                      <Text style={styles.bowlName} numberOfLines={1}>{bowl.name}</Text>
-                      <Text style={[styles.bowlCol, { width: bowlColW }]}>{bowl.overs}</Text>
-                      <Text style={[styles.bowlCol, { width: bowlColW }]}>{bowl.maidens}</Text>
-                      <Text style={[styles.bowlCol, { width: bowlColW }]}>{bowl.runs}</Text>
-                      <Text style={[styles.bowlCol, styles.bowlWickets, { width: bowlColW }]}>{bowl.wickets}</Text>
-                      <Text style={[styles.bowlCol, { width: bowlColW }]}>{bowl.economy || '-'}</Text>
+                      <Text style={styles.bowlName} numberOfLines={1} maxFontSizeMultiplier={1.3}>{bowl.name}</Text>
+                      <Text style={[styles.bowlCol, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>{bowl.overs}</Text>
+                      <Text style={[styles.bowlCol, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>{bowl.maidens}</Text>
+                      <Text style={[styles.bowlCol, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>{bowl.runs}</Text>
+                      <Text style={[styles.bowlCol, styles.bowlWickets, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>{bowl.wickets}</Text>
+                      <Text style={[styles.bowlCol, { width: bowlColW }]} maxFontSizeMultiplier={1.3}>{bowl.economy || '-'}</Text>
                     </View>
                   ))}
                 </View>
@@ -291,10 +292,10 @@ export const CricketScorecard = memo(function CricketScorecard({ innings }: Prop
           {/* Recent overs */}
           {inn.recentOvers.length > 0 && (
             <View style={styles.oversRow}>
-              <Text style={styles.oversLabel}>RECENT</Text>
+              <Text style={styles.oversLabel} maxFontSizeMultiplier={1.3}>RECENT</Text>
               {inn.recentOvers.map((runs, i) => (
                 <View key={i} style={styles.overBall}>
-                  <Text style={styles.overBallText}>{runs}</Text>
+                  <Text style={styles.overBallText} maxFontSizeMultiplier={1.3}>{runs}</Text>
                 </View>
               ))}
             </View>

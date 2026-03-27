@@ -137,7 +137,7 @@ const CategoryTable = memo(function CategoryTable({ cat, styles, C }: CategoryTa
   return (
     <View>
       <View style={styles.catHeader}>
-        <Text style={styles.catLabel}>{cat.category.toUpperCase()}</Text>
+        <Text style={styles.catLabel} maxFontSizeMultiplier={1.3}>{cat.category.toUpperCase()}</Text>
         <View style={styles.catLine} />
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -145,12 +145,13 @@ const CategoryTable = memo(function CategoryTable({ cat, styles, C }: CategoryTa
           {/* Column headers */}
           <View style={styles.tableHeader}>
             <View style={[styles.nameColHeader, { width: nameColWidth }]}>
-              <Text style={styles.headerLabel}>PLAYER</Text>
+              <Text style={styles.headerLabel} maxFontSizeMultiplier={1.3}>PLAYER</Text>
             </View>
             {cat.labels.map(lbl => (
               <Text
                 key={lbl}
                 style={[styles.headerLabel, { width: colW, textAlign: 'right' }]}
+                maxFontSizeMultiplier={1.3}
               >
                 {lbl}
               </Text>
@@ -165,9 +166,9 @@ const CategoryTable = memo(function CategoryTable({ cat, styles, C }: CategoryTa
             >
               <View style={[styles.nameCol, { width: nameColWidth }]}>
                 {player.jersey && (
-                  <Text style={styles.playerJersey}>#{player.jersey}</Text>
+                  <Text style={styles.playerJersey} maxFontSizeMultiplier={1.3}>#{player.jersey}</Text>
                 )}
-                <Text style={styles.playerName} numberOfLines={1}>
+                <Text style={styles.playerName} numberOfLines={1} maxFontSizeMultiplier={1.3}>
                   {player.name}
                 </Text>
               </View>
@@ -183,6 +184,7 @@ const CategoryTable = memo(function CategoryTable({ cat, styles, C }: CategoryTa
                       { width: colW, textAlign: 'right' },
                       isHighlight && styles.statHighlight,
                     ]}
+                    maxFontSizeMultiplier={1.3}
                   >
                     {val}
                   </Text>
@@ -220,7 +222,7 @@ export const PlayerBoxScore = memo(function PlayerBoxScore({ boxScores }: Props)
               style={[styles.tab, i === activeTeam && styles.tabActive]}
               onPress={() => setActiveTeam(i)}
             >
-              <Text style={[styles.tabText, i === activeTeam && styles.tabTextActive]}>
+              <Text style={[styles.tabText, i === activeTeam && styles.tabTextActive]} maxFontSizeMultiplier={1.3}>
                 {bs.teamAbbrev}
               </Text>
             </Pressable>
@@ -230,7 +232,7 @@ export const PlayerBoxScore = memo(function PlayerBoxScore({ boxScores }: Props)
 
       {/* Categories for selected team */}
       {team.categories.length === 0 ? (
-        <Text style={styles.emptyText}>No player stats available</Text>
+        <Text style={styles.emptyText} maxFontSizeMultiplier={1.3}>No player stats available</Text>
       ) : (
         team.categories.map(cat => (
             <CategoryTable key={cat.category} cat={cat} styles={styles} C={C} />

@@ -54,25 +54,25 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
 
   return (
     <View style={styles.wrapper}>
-      <Text style={[styles.sectionTitle, { color: C.textMuted }]}>
+      <Text style={[styles.sectionTitle, { color: C.textMuted }]} maxFontSizeMultiplier={1.3}>
         {sectionLabel}
       </Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View>
           {/* Header row */}
           <View style={styles.row}>
-            <Text style={[{ width: teamWidth }, styles.headerCell, { color: C.textMuted }]} />
+            <Text style={[{ width: teamWidth }, styles.headerCell, { color: C.textMuted }]} maxFontSizeMultiplier={1.3} />
             {labels.map(lbl => (
-              <Text key={lbl} style={[{ width: colWidth }, styles.headerCell, { color: C.textMuted, textAlign: 'center' }]}>{lbl}</Text>
+              <Text key={lbl} style={[{ width: colWidth }, styles.headerCell, { color: C.textMuted, textAlign: 'center' }]} maxFontSizeMultiplier={1.3}>{lbl}</Text>
             ))}
             {!isCricket && (
-              <Text style={[styles.totalCell, styles.headerCell, { color: C.textMuted }]}>{totalLabel}</Text>
+              <Text style={[styles.totalCell, styles.headerCell, { color: C.textMuted }]} maxFontSizeMultiplier={1.3}>{totalLabel}</Text>
             )}
           </View>
 
           {/* Away row */}
           <View style={[styles.row, styles.dataRow, { borderTopColor: C.border }]}>
-            <Text style={[{ width: teamWidth }, styles.teamLabel, { color: C.textPrimary, fontSize: 13, fontWeight: '700' }]}>{awayTeam.abbreviation}</Text>
+            <Text style={[{ width: teamWidth }, styles.teamLabel, { color: C.textPrimary, fontSize: 13, fontWeight: '700' }]} maxFontSizeMultiplier={1.3}>{awayTeam.abbreviation}</Text>
             {labels.map((_, i) => {
               const av = awayLS[i];
               const hv = homeLS[i];
@@ -82,7 +82,7 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
                   { width: colWidth, textAlign: 'center', fontSize: 13 },
                   { color: C.textSecondary },
                   awayWinsSet && { color: C.winnerScore, fontWeight: '900' },
-                ]}>
+                ]} maxFontSizeMultiplier={1.3}>
                   {av !== undefined ? String(av) : '-'}
                 </Text>
               );
@@ -92,7 +92,7 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
                 styles.totalCell,
                 { color: C.textPrimary },
                 awayTeam.winner && { color: C.winnerScore },
-              ]}>
+              ]} maxFontSizeMultiplier={1.3}>
                 {isTennis ? String(awayLS.filter((v, i) => v > (homeLS[i] ?? 0)).length) : awayTeam.score}
               </Text>
             )}
@@ -100,7 +100,7 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
 
           {/* Home row */}
           <View style={[styles.row, styles.dataRow, { borderTopColor: C.border }]}>
-            <Text style={[{ width: teamWidth }, styles.teamLabel, { color: C.textPrimary, fontSize: 13, fontWeight: '700' }]}>{homeTeam.abbreviation}</Text>
+            <Text style={[{ width: teamWidth }, styles.teamLabel, { color: C.textPrimary, fontSize: 13, fontWeight: '700' }]} maxFontSizeMultiplier={1.3}>{homeTeam.abbreviation}</Text>
             {labels.map((_, i) => {
               const hv = homeLS[i];
               const av = awayLS[i];
@@ -110,7 +110,7 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
                   { width: colWidth, textAlign: 'center', fontSize: 13 },
                   { color: C.textSecondary },
                   homeWinsSet && { color: C.winnerScore, fontWeight: '900' },
-                ]}>
+                ]} maxFontSizeMultiplier={1.3}>
                   {hv !== undefined ? String(hv) : '-'}
                 </Text>
               );
@@ -120,7 +120,7 @@ export const LineScores = memo(function LineScores({ sport, homeTeam, awayTeam }
                 styles.totalCell,
                 { color: C.textPrimary },
                 homeTeam.winner && { color: C.winnerScore },
-              ]}>
+              ]} maxFontSizeMultiplier={1.3}>
                 {isTennis ? String(homeLS.filter((v, i) => v > (awayLS[i] ?? 0)).length) : homeTeam.score}
               </Text>
             )}

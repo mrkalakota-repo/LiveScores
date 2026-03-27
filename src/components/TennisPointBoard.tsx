@@ -101,7 +101,8 @@ export const TennisPointBoard = memo(function TennisPointBoard({
               key={play.id}
               style={[
                 styles.playRow,
-                i > 0 && { borderTopWidth: 1, borderTopColor: C.borderSubtle },
+                i > 0 && styles.playRowBorder,
+                i > 0 && { borderTopColor: C.borderSubtle },
               ]}
             >
               {play.team && (
@@ -186,6 +187,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 9,
     gap: 10,
+  },
+  playRowBorder: {
+    borderTopWidth: 1,
   },
   teamPill: {
     paddingHorizontal: 7,

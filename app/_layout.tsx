@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { ActivityIndicator, AppState, AppStateStatus, Platform, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-query';
@@ -7,6 +8,7 @@ import { LiveGamesProvider } from '@/contexts/LiveGamesContext';
 import { LiveCountPoller } from '@/components/LiveCountPoller';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { SportPreferencesProvider, useSportPreferences } from '@/contexts/SportPreferencesContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,10 +56,14 @@ function AppContent() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <SportPreferencesProvider>
-        <AppContent />
-      </SportPreferencesProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <SportPreferencesProvider>
+            <AppContent />
+          </SportPreferencesProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </GestureHandlerRootView>
   );
 }
